@@ -2,7 +2,7 @@
 Copyright © 2013-2018 chibayuki@foxmail.com
 
 数独
-Version 7.1.17000.4433.R12.180602-0000
+Version 7.1.17000.4433.R12.180604-0000
 
 This file is part of 数独
 
@@ -39,7 +39,7 @@ namespace WinFormApp
         private static readonly Int32 BuildNumber = new Version(Application.ProductVersion).Build; // 版本号。
         private static readonly Int32 BuildRevision = new Version(Application.ProductVersion).Revision; // 修订版本。
         private static readonly string LabString = "R12"; // 分支名。
-        private static readonly string BuildTime = "180602-0000"; // 编译时间。
+        private static readonly string BuildTime = "180604-0000"; // 编译时间。
 
         //
 
@@ -1433,7 +1433,7 @@ namespace WinFormApp
                                     string StrSF = RegexUint.Replace(Fields[i++], string.Empty);
                                     SF = (Convert.ToInt32(StrSF) == 0 ? false : true);
 
-                                    if ((Index.X >= 0 && Index.X < Range.Width && Index.Y >= 0 && Index.Y < Range.Height) && (E >= 1 && E <= SudokuSize))
+                                    if ((Index.X >= 0 && Index.X < Range.Width && Index.Y >= 0 && Index.Y < Range.Height) && (E > 0 && E <= SudokuSize))
                                     {
                                         ElementArray_Last[Index.X, Index.Y] = E;
                                         ElementIndexList_Last.Add(Index);
@@ -1656,7 +1656,7 @@ namespace WinFormApp
                                         string StrVal = RegexUint.Replace(Fields[i++], string.Empty);
                                         E = Convert.ToInt32(StrVal);
 
-                                        if ((Index.X >= 0 && Index.X < Range.Width && Index.Y >= 0 && Index.Y < Range.Height) && (E >= 1 && E <= SudokuSize))
+                                        if ((Index.X >= 0 && Index.X < Range.Width && Index.Y >= 0 && Index.Y < Range.Height) && (E > 0 && E <= SudokuSize))
                                         {
                                             S.ElementArray[Index.X, Index.Y] = E;
                                         }
@@ -1729,7 +1729,7 @@ namespace WinFormApp
                                         string StrVal = RegexUint.Replace(Fields[i++], string.Empty);
                                         E = Convert.ToInt32(StrVal);
 
-                                        if ((Index.X >= 0 && Index.X < Range.Width && Index.Y >= 0 && Index.Y < Range.Height) && (E >= 1 && E <= SudokuSize))
+                                        if ((Index.X >= 0 && Index.X < Range.Width && Index.Y >= 0 && Index.Y < Range.Height) && (E > 0 && E <= SudokuSize))
                                         {
                                             S.ElementArray[Index.X, Index.Y] = E;
                                         }
@@ -2267,7 +2267,7 @@ namespace WinFormApp
                 {
                     return Me.RecommendColors.Background.ToColor();
                 }
-                else if (E >= 1)
+                else if (E > 0)
                 {
                     return Me.RecommendColors.Main_DEC.ToColor();
                 }
@@ -2526,7 +2526,7 @@ namespace WinFormApp
 
                     if (Timer_Timer.Enabled || GameIsWin)
                     {
-                        string StringText = ((E >= 1 && E <= SudokuSize) ? E.ToString() : string.Empty);
+                        string StringText = ((E > 0 && E <= SudokuSize) ? E.ToString() : string.Empty);
 
                         if (StringText.Length > 0)
                         {
@@ -3795,7 +3795,7 @@ namespace WinFormApp
                 {
                     Int32 E = Sudoku[X, Y];
 
-                    if (E >= 1 && E <= SudokuSize)
+                    if (E > 0 && E <= SudokuSize)
                     {
                         if (!SolidFlagTable[X, Y])
                         {
@@ -5013,6 +5013,8 @@ namespace WinFormApp
             //
 
             Panel_Environment.Focus();
+
+            //
 
             if (Timer_Timer.Enabled)
             {

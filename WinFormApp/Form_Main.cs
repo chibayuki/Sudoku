@@ -2,7 +2,7 @@
 Copyright © 2013-2018 chibayuki@foxmail.com
 
 数独
-Version 7.1.17000.4433.R12.180606-0000
+Version 7.1.17000.4433.R12.180607-0000
 
 This file is part of 数独
 
@@ -39,7 +39,7 @@ namespace WinFormApp
         private static readonly Int32 BuildNumber = new Version(Application.ProductVersion).Build; // 版本号。
         private static readonly Int32 BuildRevision = new Version(Application.ProductVersion).Revision; // 修订版本。
         private static readonly string LabString = "R12"; // 分支名。
-        private static readonly string BuildTime = "180606-0000"; // 编译时间。
+        private static readonly string BuildTime = "180607-0000"; // 编译时间。
 
         //
 
@@ -345,6 +345,8 @@ namespace WinFormApp
             Me.FormStateChanged += FormStateChangedEvents;
             Me.ThemeChanged += ThemeColorChangedEvents;
             Me.ThemeColorChanged += ThemeColorChangedEvents;
+
+            Me.CloseVerification = CloseVerification;
         }
 
         #endregion
@@ -689,6 +691,17 @@ namespace WinFormApp
 
             Com.WinForm.ControlSubstitution.LabelAsButton(Label_GitHub_Base, Label_GitHub_Base_Click, Color.Transparent, Me.RecommendColors.Button_DEC.ToColor(), Me.RecommendColors.Button_INC.ToColor(), new Font("微软雅黑", 9.75F, FontStyle.Underline, GraphicsUnit.Point, 134), new Font("微软雅黑", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 134), new Font("微软雅黑", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 134));
             Com.WinForm.ControlSubstitution.LabelAsButton(Label_GitHub_Release, Label_GitHub_Release_Click, Color.Transparent, Me.RecommendColors.Button_DEC.ToColor(), Me.RecommendColors.Button_INC.ToColor(), new Font("微软雅黑", 9.75F, FontStyle.Underline, GraphicsUnit.Point, 134), new Font("微软雅黑", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 134), new Font("微软雅黑", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 134));
+        }
+
+        //
+
+        private bool CloseVerification(EventArgs e)
+        {
+            //
+            // 用于验证是否允许窗口关闭的方法。
+            //
+
+            return (!BackgroundWorker_LoadGameStep.IsBusy && !BackgroundWorker_SaveGameStep.IsBusy);
         }
 
         #endregion
@@ -1829,9 +1842,11 @@ namespace WinFormApp
 
             //
 
-            Me.Enabled = true;
-
             Me.Caption = ApplicationName;
+
+            //
+
+            Panel_Interrupt.Enabled = true;
         }
 
         private void LoadGameStepInBackground()
@@ -1840,9 +1855,11 @@ namespace WinFormApp
             // 后台加载游戏步骤。
             //
 
-            Me.Enabled = false;
-
             Me.Caption = ApplicationName + " [正在打开]";
+
+            //
+
+            Panel_Interrupt.Enabled = false;
 
             //
 
@@ -1857,9 +1874,11 @@ namespace WinFormApp
             // 前台加载游戏步骤。
             //
 
-            Me.Enabled = false;
-
             Me.Caption = ApplicationName + " [正在打开]";
+
+            //
+
+            Panel_Interrupt.Enabled = false;
 
             //
 
@@ -1892,9 +1911,11 @@ namespace WinFormApp
 
             //
 
-            Me.Enabled = true;
-
             Me.Caption = ApplicationName;
+
+            //
+
+            Panel_Interrupt.Enabled = true;
         }
 
         private void _SaveGameStep()
@@ -2077,9 +2098,11 @@ namespace WinFormApp
 
             //
 
-            Me.Enabled = true;
-
             Me.Caption = ApplicationName;
+
+            //
+
+            Panel_Interrupt.Enabled = true;
         }
 
         private void SaveGameStepInBackground()
@@ -2088,9 +2111,11 @@ namespace WinFormApp
             // 后台保存游戏步骤。
             //
 
-            Me.Enabled = false;
-
             Me.Caption = ApplicationName + " [正在保存]";
+
+            //
+
+            Panel_Interrupt.Enabled = false;
 
             //
 
@@ -4688,7 +4713,7 @@ namespace WinFormApp
 
                         TimerStop();
 
-                        if (!GameIsWin && (ThisRecord.GameTime.TotalMilliseconds > 0 && ThisRecord.StepCount > 0))
+                        if ((!BackgroundWorker_LoadGameStep.IsBusy && !BackgroundWorker_SaveGameStep.IsBusy) && !GameIsWin && (ThisRecord.GameTime.TotalMilliseconds > 0 && ThisRecord.StepCount > 0))
                         {
                             SaveGameStepInForeground();
                         }
@@ -5002,56 +5027,59 @@ namespace WinFormApp
             // 鼠标经过 Panel_Environment。
             //
 
-            Panel_Environment.Focus();
-
-            //
-
-            if (Timer_Timer.Enabled)
+            if (!BackgroundWorker_LoadGameStep.IsBusy && !BackgroundWorker_SaveGameStep.IsBusy)
             {
-                if (OperationMode == OperationModes.Mouse || OperationMode == OperationModes.Touch)
+                Panel_Environment.Focus();
+
+                //
+
+                if (Timer_Timer.Enabled)
                 {
-                    Point CurPtOfCtrl = Com.Geometry.GetCursorPositionOfControl(Panel_Environment);
-
-                    //
-
-                    Point A = ElementArray_GetIndex(CurPtOfCtrl);
-
-                    if (GameUIPointedIndex != A)
+                    if (OperationMode == OperationModes.Mouse || OperationMode == OperationModes.Touch)
                     {
-                        Point LastPointedIndex = GameUIPointedIndex;
+                        Point CurPtOfCtrl = Com.Geometry.GetCursorPositionOfControl(Panel_Environment);
 
-                        if (A != OperatingIndex)
+                        //
+
+                        Point A = ElementArray_GetIndex(CurPtOfCtrl);
+
+                        if (GameUIPointedIndex != A)
                         {
-                            GameUIPointedIndex = A;
-                        }
-                        else
-                        {
-                            GameUIPointedIndex = new Point(-1, -1);
-                        }
+                            Point LastPointedIndex = GameUIPointedIndex;
 
-                        ElementArray_PresentAt(LastPointedIndex);
-                        ElementArray_PresentAt(GameUIPointedIndex);
-                    }
+                            if (A != OperatingIndex)
+                            {
+                                GameUIPointedIndex = A;
+                            }
+                            else
+                            {
+                                GameUIPointedIndex = new Point(-1, -1);
+                            }
 
-                    //
-
-                    Int32 Number = ElementArray_GetCandidateNumberAt(CurPtOfCtrl);
-
-                    if (GameUIPointedNumber != Number)
-                    {
-                        Int32 LastPointedNumber = GameUIPointedNumber;
-
-                        if (Number != OperatingNumber)
-                        {
-                            GameUIPointedNumber = Number;
-                        }
-                        else
-                        {
-                            GameUIPointedNumber = -1;
+                            ElementArray_PresentAt(LastPointedIndex);
+                            ElementArray_PresentAt(GameUIPointedIndex);
                         }
 
-                        ElementArray_UpdateCandidateNumberArea(LastPointedNumber, true);
-                        ElementArray_UpdateCandidateNumberArea(GameUIPointedNumber, true);
+                        //
+
+                        Int32 Number = ElementArray_GetCandidateNumberAt(CurPtOfCtrl);
+
+                        if (GameUIPointedNumber != Number)
+                        {
+                            Int32 LastPointedNumber = GameUIPointedNumber;
+
+                            if (Number != OperatingNumber)
+                            {
+                                GameUIPointedNumber = Number;
+                            }
+                            else
+                            {
+                                GameUIPointedNumber = -1;
+                            }
+
+                            ElementArray_UpdateCandidateNumberArea(LastPointedNumber, true);
+                            ElementArray_UpdateCandidateNumberArea(GameUIPointedNumber, true);
+                        }
                     }
                 }
             }
@@ -5063,23 +5091,26 @@ namespace WinFormApp
             // 鼠标离开 Panel_Environment。
             //
 
-            if (Timer_Timer.Enabled)
+            if (!BackgroundWorker_LoadGameStep.IsBusy && !BackgroundWorker_SaveGameStep.IsBusy)
             {
-                if (OperationMode == OperationModes.Mouse || OperationMode == OperationModes.Touch)
+                if (Timer_Timer.Enabled)
                 {
-                    Point LastPointedIndex = GameUIPointedIndex;
-                    GameUIPointedIndex = new Point(-1, -1);
+                    if (OperationMode == OperationModes.Mouse || OperationMode == OperationModes.Touch)
+                    {
+                        Point LastPointedIndex = GameUIPointedIndex;
+                        GameUIPointedIndex = new Point(-1, -1);
 
-                    ElementArray_PresentAt(LastPointedIndex);
-                    ElementArray_PresentAt(GameUIPointedIndex);
+                        ElementArray_PresentAt(LastPointedIndex);
+                        ElementArray_PresentAt(GameUIPointedIndex);
 
-                    //
+                        //
 
-                    Int32 LastPointedNumber = GameUIPointedNumber;
-                    GameUIPointedNumber = -1;
+                        Int32 LastPointedNumber = GameUIPointedNumber;
+                        GameUIPointedNumber = -1;
 
-                    ElementArray_UpdateCandidateNumberArea(LastPointedNumber, true);
-                    ElementArray_UpdateCandidateNumberArea(GameUIPointedNumber, true);
+                        ElementArray_UpdateCandidateNumberArea(LastPointedNumber, true);
+                        ElementArray_UpdateCandidateNumberArea(GameUIPointedNumber, true);
+                    }
                 }
             }
         }
@@ -5090,16 +5121,19 @@ namespace WinFormApp
             // 鼠标按下 Panel_Environment。
             //
 
-            if (Timer_Timer.Enabled && e.Button == MouseButtons.Left)
+            if (!BackgroundWorker_LoadGameStep.IsBusy && !BackgroundWorker_SaveGameStep.IsBusy)
             {
-                GameUIPointedIndex = new Point(-1, -1);
-                GameUIPointedNumber = -1;
+                if (Timer_Timer.Enabled && e.Button == MouseButtons.Left)
+                {
+                    GameUIPointedIndex = new Point(-1, -1);
+                    GameUIPointedNumber = -1;
 
-                //
+                    //
 
-                Point CurPtOfCtrl = Com.Geometry.GetCursorPositionOfControl(Panel_Environment);
+                    Point CurPtOfCtrl = Com.Geometry.GetCursorPositionOfControl(Panel_Environment);
 
-                ElementArray_MouseDownOperation(CurPtOfCtrl);
+                    ElementArray_MouseDownOperation(CurPtOfCtrl);
+                }
             }
         }
 
@@ -5109,16 +5143,19 @@ namespace WinFormApp
             // 鼠标释放 Panel_Environment。
             //
 
-            if (Timer_Timer.Enabled && e.Button == MouseButtons.Left)
+            if (!BackgroundWorker_LoadGameStep.IsBusy && !BackgroundWorker_SaveGameStep.IsBusy)
             {
-                GameUIPointedIndex = new Point(-1, -1);
-                GameUIPointedNumber = -1;
+                if (Timer_Timer.Enabled && e.Button == MouseButtons.Left)
+                {
+                    GameUIPointedIndex = new Point(-1, -1);
+                    GameUIPointedNumber = -1;
 
-                //
+                    //
 
-                Point CurPtOfCtrl = Com.Geometry.GetCursorPositionOfControl(Panel_Environment);
+                    Point CurPtOfCtrl = Com.Geometry.GetCursorPositionOfControl(Panel_Environment);
 
-                ElementArray_MouseUpOperation(CurPtOfCtrl);
+                    ElementArray_MouseUpOperation(CurPtOfCtrl);
+                }
             }
         }
 
@@ -5128,41 +5165,44 @@ namespace WinFormApp
             // 在 Panel_Environment 按下键。
             //
 
-            if (AlwaysEnableKeyboard || OperationMode == OperationModes.Keyboard)
+            if (!BackgroundWorker_LoadGameStep.IsBusy && !BackgroundWorker_SaveGameStep.IsBusy)
             {
-                if (!GameIsWin)
+                if (AlwaysEnableKeyboard || OperationMode == OperationModes.Keyboard)
                 {
-                    if (e.KeyCode == Keys.Space)
+                    if (!GameIsWin)
                     {
-                        if (Timer_Timer.Enabled)
+                        if (e.KeyCode == Keys.Space)
                         {
-                            Interrupt(InterruptActions.Pause);
+                            if (Timer_Timer.Enabled)
+                            {
+                                Interrupt(InterruptActions.Pause);
+                            }
+                            else
+                            {
+                                Interrupt(InterruptActions.Resume);
+                            }
                         }
                         else
                         {
-                            Interrupt(InterruptActions.Resume);
-                        }
-                    }
-                    else
-                    {
-                        if (Timer_Timer.Enabled)
-                        {
-                            switch (e.KeyCode)
+                            if (Timer_Timer.Enabled)
                             {
-                                case Keys.PageUp: Interrupt(InterruptActions.Previous); break;
-                                case Keys.PageDown: Interrupt(InterruptActions.Next); break;
+                                switch (e.KeyCode)
+                                {
+                                    case Keys.PageUp: Interrupt(InterruptActions.Previous); break;
+                                    case Keys.PageDown: Interrupt(InterruptActions.Next); break;
 
-                                default: ElementArray_KeyOperation(e.KeyCode); break;
+                                    default: ElementArray_KeyOperation(e.KeyCode); break;
+                                }
                             }
                         }
                     }
-                }
 
-                switch (e.KeyCode)
-                {
-                    case Keys.Home: Interrupt(InterruptActions.Restart); break;
-                    case Keys.End:
-                    case Keys.Escape: Interrupt(InterruptActions.Exit); break;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Home: Interrupt(InterruptActions.Restart); break;
+                        case Keys.End:
+                        case Keys.Escape: Interrupt(InterruptActions.Exit); break;
+                    }
                 }
             }
         }

@@ -45,7 +45,6 @@
             this.Label_ContinueLastGame = new System.Windows.Forms.Label();
             this.Panel_Tab_Record = new System.Windows.Forms.Panel();
             this.Panel_Score = new System.Windows.Forms.Panel();
-            this.PictureBox_Score = new System.Windows.Forms.PictureBox();
             this.Label_ThisRecord = new System.Windows.Forms.Label();
             this.Label_ThisRecordVal_GameTime = new System.Windows.Forms.Label();
             this.Label_ThisRecordVal_StepCount = new System.Windows.Forms.Label();
@@ -53,7 +52,6 @@
             this.Label_BestRecordVal_GameTime = new System.Windows.Forms.Label();
             this.Label_BestRecordVal_StepCount = new System.Windows.Forms.Label();
             this.Panel_GameTime = new System.Windows.Forms.Panel();
-            this.PictureBox_GameTime = new System.Windows.Forms.PictureBox();
             this.Label_TotalTimeVal = new System.Windows.Forms.Label();
             this.Label_ThisTimeVal = new System.Windows.Forms.Label();
             this.Label_TotalTime = new System.Windows.Forms.Label();
@@ -96,7 +94,6 @@
             this.CheckBox_AntiAlias = new System.Windows.Forms.CheckBox();
             this.Label_AntiAlias = new System.Windows.Forms.Label();
             this.Panel_Tab_About = new System.Windows.Forms.Panel();
-            this.PictureBox_ApplicationLogo = new System.Windows.Forms.PictureBox();
             this.Label_ApplicationName = new System.Windows.Forms.Label();
             this.Label_ApplicationEdition = new System.Windows.Forms.Label();
             this.Label_Version = new System.Windows.Forms.Label();
@@ -122,6 +119,9 @@
             this.ColorDialog_ThemeColor = new System.Windows.Forms.ColorDialog();
             this.BackgroundWorker_LoadGameStep = new System.ComponentModel.BackgroundWorker();
             this.BackgroundWorker_SaveGameStep = new System.ComponentModel.BackgroundWorker();
+            this.PictureBox_Score = new System.Windows.Forms.PictureBox();
+            this.PictureBox_GameTime = new System.Windows.Forms.PictureBox();
+            this.PictureBox_ApplicationLogo = new System.Windows.Forms.PictureBox();
             this.Panel_Main.SuspendLayout();
             this.Panel_Client.SuspendLayout();
             this.Panel_FunctionArea.SuspendLayout();
@@ -131,9 +131,7 @@
             this.Panel_EnterGameSelection.SuspendLayout();
             this.Panel_Tab_Record.SuspendLayout();
             this.Panel_Score.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Score)).BeginInit();
             this.Panel_GameTime.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_GameTime)).BeginInit();
             this.Panel_Tab_Options.SuspendLayout();
             this.Panel_Order.SuspendLayout();
             this.Panel_DifficultyLevel.SuspendLayout();
@@ -143,7 +141,6 @@
             this.Panel_ThemeColor.SuspendLayout();
             this.Panel_AntiAlias.SuspendLayout();
             this.Panel_Tab_About.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_ApplicationLogo)).BeginInit();
             this.Panel_GitHub.SuspendLayout();
             this.Panel_GameUI.SuspendLayout();
             this.Panel_Current.SuspendLayout();
@@ -154,6 +151,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Interrupt)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Restart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_ExitGame)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Score)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_GameTime)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_ApplicationLogo)).BeginInit();
             this.SuspendLayout();
             // 
             // Panel_Main
@@ -365,19 +365,6 @@
             this.Panel_Score.TabIndex = 0;
             this.Panel_Score.Paint += new System.Windows.Forms.PaintEventHandler(this.Panel_Score_Paint);
             // 
-            // PictureBox_Score
-            // 
-            this.PictureBox_Score.BackColor = System.Drawing.Color.Transparent;
-            this.PictureBox_Score.ErrorImage = null;
-            this.PictureBox_Score.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_Score.Image")));
-            this.PictureBox_Score.InitialImage = null;
-            this.PictureBox_Score.Location = new System.Drawing.Point(0, 0);
-            this.PictureBox_Score.Name = "PictureBox_Score";
-            this.PictureBox_Score.Size = new System.Drawing.Size(20, 20);
-            this.PictureBox_Score.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.PictureBox_Score.TabIndex = 0;
-            this.PictureBox_Score.TabStop = false;
-            // 
             // Label_ThisRecord
             // 
             this.Label_ThisRecord.AutoSize = true;
@@ -463,19 +450,6 @@
             this.Panel_GameTime.Size = new System.Drawing.Size(360, 120);
             this.Panel_GameTime.TabIndex = 0;
             this.Panel_GameTime.Paint += new System.Windows.Forms.PaintEventHandler(this.Panel_GameTime_Paint);
-            // 
-            // PictureBox_GameTime
-            // 
-            this.PictureBox_GameTime.BackColor = System.Drawing.Color.Transparent;
-            this.PictureBox_GameTime.ErrorImage = null;
-            this.PictureBox_GameTime.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_GameTime.Image")));
-            this.PictureBox_GameTime.InitialImage = null;
-            this.PictureBox_GameTime.Location = new System.Drawing.Point(0, 0);
-            this.PictureBox_GameTime.Name = "PictureBox_GameTime";
-            this.PictureBox_GameTime.Size = new System.Drawing.Size(20, 20);
-            this.PictureBox_GameTime.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.PictureBox_GameTime.TabIndex = 0;
-            this.PictureBox_GameTime.TabStop = false;
             // 
             // Label_TotalTimeVal
             // 
@@ -1038,19 +1012,6 @@
             this.Panel_Tab_About.TabIndex = 0;
             this.Panel_Tab_About.Visible = false;
             // 
-            // PictureBox_ApplicationLogo
-            // 
-            this.PictureBox_ApplicationLogo.BackColor = System.Drawing.Color.Transparent;
-            this.PictureBox_ApplicationLogo.ErrorImage = null;
-            this.PictureBox_ApplicationLogo.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_ApplicationLogo.Image")));
-            this.PictureBox_ApplicationLogo.InitialImage = null;
-            this.PictureBox_ApplicationLogo.Location = new System.Drawing.Point(60, 60);
-            this.PictureBox_ApplicationLogo.Name = "PictureBox_ApplicationLogo";
-            this.PictureBox_ApplicationLogo.Size = new System.Drawing.Size(64, 64);
-            this.PictureBox_ApplicationLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.PictureBox_ApplicationLogo.TabIndex = 0;
-            this.PictureBox_ApplicationLogo.TabStop = false;
-            // 
             // Label_ApplicationName
             // 
             this.Label_ApplicationName.AutoSize = true;
@@ -1197,7 +1158,6 @@
             // 
             this.PictureBox_Erase.BackColor = System.Drawing.Color.Transparent;
             this.PictureBox_Erase.ErrorImage = null;
-            this.PictureBox_Erase.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_Erase.Image")));
             this.PictureBox_Erase.InitialImage = null;
             this.PictureBox_Erase.Location = new System.Drawing.Point(0, 0);
             this.PictureBox_Erase.Name = "PictureBox_Erase";
@@ -1211,7 +1171,6 @@
             // 
             this.PictureBox_Undo.BackColor = System.Drawing.Color.Transparent;
             this.PictureBox_Undo.ErrorImage = null;
-            this.PictureBox_Undo.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_Undo.Image")));
             this.PictureBox_Undo.InitialImage = null;
             this.PictureBox_Undo.Location = new System.Drawing.Point(50, 0);
             this.PictureBox_Undo.Name = "PictureBox_Undo";
@@ -1224,7 +1183,6 @@
             // 
             this.PictureBox_Redo.BackColor = System.Drawing.Color.Transparent;
             this.PictureBox_Redo.ErrorImage = null;
-            this.PictureBox_Redo.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_Redo.Image")));
             this.PictureBox_Redo.InitialImage = null;
             this.PictureBox_Redo.Location = new System.Drawing.Point(100, 0);
             this.PictureBox_Redo.Name = "PictureBox_Redo";
@@ -1237,7 +1195,6 @@
             // 
             this.PictureBox_Interrupt.BackColor = System.Drawing.Color.Transparent;
             this.PictureBox_Interrupt.ErrorImage = null;
-            this.PictureBox_Interrupt.Image = global::WinFormApp.Properties.Resources.Pause;
             this.PictureBox_Interrupt.InitialImage = null;
             this.PictureBox_Interrupt.Location = new System.Drawing.Point(150, 0);
             this.PictureBox_Interrupt.Name = "PictureBox_Interrupt";
@@ -1250,7 +1207,6 @@
             // 
             this.PictureBox_Restart.BackColor = System.Drawing.Color.Transparent;
             this.PictureBox_Restart.ErrorImage = null;
-            this.PictureBox_Restart.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_Restart.Image")));
             this.PictureBox_Restart.InitialImage = null;
             this.PictureBox_Restart.Location = new System.Drawing.Point(200, 0);
             this.PictureBox_Restart.Name = "PictureBox_Restart";
@@ -1263,7 +1219,6 @@
             // 
             this.PictureBox_ExitGame.BackColor = System.Drawing.Color.Transparent;
             this.PictureBox_ExitGame.ErrorImage = null;
-            this.PictureBox_ExitGame.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_ExitGame.Image")));
             this.PictureBox_ExitGame.InitialImage = null;
             this.PictureBox_ExitGame.Location = new System.Drawing.Point(250, 0);
             this.PictureBox_ExitGame.Name = "PictureBox_ExitGame";
@@ -1320,6 +1275,45 @@
             this.BackgroundWorker_SaveGameStep.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundWorker_SaveGameStep_ProgressChanged);
             this.BackgroundWorker_SaveGameStep.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundWorker_SaveGameStep_RunWorkerCompleted);
             // 
+            // PictureBox_Score
+            // 
+            this.PictureBox_Score.BackColor = System.Drawing.Color.Transparent;
+            this.PictureBox_Score.ErrorImage = null;
+            this.PictureBox_Score.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_Score.Image")));
+            this.PictureBox_Score.InitialImage = null;
+            this.PictureBox_Score.Location = new System.Drawing.Point(0, 0);
+            this.PictureBox_Score.Name = "PictureBox_Score";
+            this.PictureBox_Score.Size = new System.Drawing.Size(20, 20);
+            this.PictureBox_Score.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.PictureBox_Score.TabIndex = 0;
+            this.PictureBox_Score.TabStop = false;
+            // 
+            // PictureBox_GameTime
+            // 
+            this.PictureBox_GameTime.BackColor = System.Drawing.Color.Transparent;
+            this.PictureBox_GameTime.ErrorImage = null;
+            this.PictureBox_GameTime.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_GameTime.Image")));
+            this.PictureBox_GameTime.InitialImage = null;
+            this.PictureBox_GameTime.Location = new System.Drawing.Point(0, 0);
+            this.PictureBox_GameTime.Name = "PictureBox_GameTime";
+            this.PictureBox_GameTime.Size = new System.Drawing.Size(20, 20);
+            this.PictureBox_GameTime.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.PictureBox_GameTime.TabIndex = 0;
+            this.PictureBox_GameTime.TabStop = false;
+            // 
+            // PictureBox_ApplicationLogo
+            // 
+            this.PictureBox_ApplicationLogo.BackColor = System.Drawing.Color.Transparent;
+            this.PictureBox_ApplicationLogo.ErrorImage = null;
+            this.PictureBox_ApplicationLogo.Image = ((System.Drawing.Image)(resources.GetObject("PictureBox_ApplicationLogo.Image")));
+            this.PictureBox_ApplicationLogo.InitialImage = null;
+            this.PictureBox_ApplicationLogo.Location = new System.Drawing.Point(60, 60);
+            this.PictureBox_ApplicationLogo.Name = "PictureBox_ApplicationLogo";
+            this.PictureBox_ApplicationLogo.Size = new System.Drawing.Size(64, 64);
+            this.PictureBox_ApplicationLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.PictureBox_ApplicationLogo.TabIndex = 0;
+            this.PictureBox_ApplicationLogo.TabStop = false;
+            // 
             // Form_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1343,10 +1337,8 @@
             this.Panel_Tab_Record.ResumeLayout(false);
             this.Panel_Score.ResumeLayout(false);
             this.Panel_Score.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Score)).EndInit();
             this.Panel_GameTime.ResumeLayout(false);
             this.Panel_GameTime.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_GameTime)).EndInit();
             this.Panel_Tab_Options.ResumeLayout(false);
             this.Panel_Order.ResumeLayout(false);
             this.Panel_Order.PerformLayout();
@@ -1364,7 +1356,6 @@
             this.Panel_AntiAlias.PerformLayout();
             this.Panel_Tab_About.ResumeLayout(false);
             this.Panel_Tab_About.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_ApplicationLogo)).EndInit();
             this.Panel_GitHub.ResumeLayout(false);
             this.Panel_GitHub.PerformLayout();
             this.Panel_GameUI.ResumeLayout(false);
@@ -1376,6 +1367,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Interrupt)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Restart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox_ExitGame)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_Score)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_GameTime)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PictureBox_ApplicationLogo)).EndInit();
             this.ResumeLayout(false);
 
         }

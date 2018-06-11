@@ -2,7 +2,7 @@
 Copyright © 2013-2018 chibayuki@foxmail.com
 
 数独
-Version 7.1.17000.4433.R12.180610-0000
+Version 7.1.17000.4433.R12.180611-0000
 
 This file is part of 数独
 
@@ -39,7 +39,7 @@ namespace WinFormApp
         private static readonly Int32 BuildNumber = new Version(Application.ProductVersion).Build; // 版本号。
         private static readonly Int32 BuildRevision = new Version(Application.ProductVersion).Revision; // 修订版本。
         private static readonly string LabString = "R12"; // 分支名。
-        private static readonly string BuildTime = "180610-0000"; // 编译时间。
+        private static readonly string BuildTime = "180611-0000"; // 编译时间。
 
         //
 
@@ -78,6 +78,10 @@ namespace WinFormApp
         #endregion
 
         #region 配置设置变量
+
+        private Int32 ElementSize = 60; // 元素边长。
+
+        //
 
         private enum Orders { Order3 = 3, Order4 = 4, Order5 = 5, MIN = 3, MAX = 5 } // 数独的阶数枚举。【注意】为避免枚举与整数或字符串之间的转换发生意外，应始终将表示范围的枚举 MIN 与 MAX 置于最后。
         private Orders Order = Orders.Order3; // 当前数独的阶数。
@@ -128,13 +132,9 @@ namespace WinFormApp
 
         private Size Range => new Size(SudokuSize, SudokuSize); // 当前界面布局（以元素数为单位）。
 
-        private Int32[,] ElementArray = new Int32[CAPACITY, CAPACITY]; // 元素矩阵。
+        private Int32[,] ElementMatrix = new Int32[CAPACITY, CAPACITY]; // 元素矩阵。
 
         private List<Point> ElementIndexList = new List<Point>(CAPACITY * CAPACITY); // 元素索引列表。
-
-        //
-
-        private Int32 ElementSize = 60; // 元素边长。
 
         #endregion
 
@@ -189,7 +189,7 @@ namespace WinFormApp
 
         private Record Record_Last = new Record(); // 上次游戏的记录。
 
-        private Int32[,] ElementArray_Last = new Int32[CAPACITY, CAPACITY]; // 上次游戏的元素矩阵。
+        private Int32[,] ElementMatrix_Last = new Int32[CAPACITY, CAPACITY]; // 上次游戏的元素矩阵。
 
         private List<Point> ElementIndexList_Last = new List<Point>(CAPACITY * CAPACITY); // 上次游戏的元素索引列表。
 
@@ -597,7 +597,7 @@ namespace WinFormApp
 
                 RepaintCurBmp();
 
-                ElementArray_RepresentAll();
+                ElementMatrix_RepresentAll();
             }
 
             if (Panel_FunctionArea.Visible && FunctionAreaTab == FunctionAreaTabs.Record)
@@ -1459,9 +1459,9 @@ namespace WinFormApp
                                     string StrSF = RegexUint.Replace(Fields[i++], string.Empty);
                                     SF = (Convert.ToInt32(StrSF) == 0 ? false : true);
 
-                                    if ((Index.X >= 0 && Index.X < Range.Width && Index.Y >= 0 && Index.Y < Range.Height) && (E > 0 && E <= SudokuSize))
+                                    if (ElementMatrix_IndexValid(Index) && (E > 0 && E <= SudokuSize))
                                     {
-                                        ElementArray_Last[Index.X, Index.Y] = E;
+                                        ElementMatrix_Last[Index.X, Index.Y] = E;
                                         ElementIndexList_Last.Add(Index);
 
                                         SolidFlagTable_Last[Index.X, Index.Y] = SF;
@@ -1513,7 +1513,7 @@ namespace WinFormApp
 
             foreach (var V in ElementIndexList_Last)
             {
-                ElementArray_Last[V.X, V.Y] = 0;
+                ElementMatrix_Last[V.X, V.Y] = 0;
             }
 
             ElementIndexList_Last.Clear();
@@ -1654,7 +1654,7 @@ namespace WinFormApp
                             string StepString = Com.Text.GetIntervalString(SubStr, "[", "]", false, false);
 
                             Step S = new Step();
-                            S.ElementArray = new Int32[CAPACITY, CAPACITY];
+                            S.ElementMatrix = new Int32[CAPACITY, CAPACITY];
 
                             //
 
@@ -1682,9 +1682,9 @@ namespace WinFormApp
                                         string StrVal = RegexUint.Replace(Fields[i++], string.Empty);
                                         E = Convert.ToInt32(StrVal);
 
-                                        if ((Index.X >= 0 && Index.X < Range.Width && Index.Y >= 0 && Index.Y < Range.Height) && (E > 0 && E <= SudokuSize))
+                                        if (ElementMatrix_IndexValid(Index) && (E > 0 && E <= SudokuSize))
                                         {
-                                            S.ElementArray[Index.X, Index.Y] = E;
+                                            S.ElementMatrix[Index.X, Index.Y] = E;
                                         }
                                     }
                                 }
@@ -1727,7 +1727,7 @@ namespace WinFormApp
                             string StepString = Com.Text.GetIntervalString(SubStr, "[", "]", false, false);
 
                             Step S = new Step();
-                            S.ElementArray = new Int32[CAPACITY, CAPACITY];
+                            S.ElementMatrix = new Int32[CAPACITY, CAPACITY];
 
                             //
 
@@ -1755,9 +1755,9 @@ namespace WinFormApp
                                         string StrVal = RegexUint.Replace(Fields[i++], string.Empty);
                                         E = Convert.ToInt32(StrVal);
 
-                                        if ((Index.X >= 0 && Index.X < Range.Width && Index.Y >= 0 && Index.Y < Range.Height) && (E > 0 && E <= SudokuSize))
+                                        if (ElementMatrix_IndexValid(Index) && (E > 0 && E <= SudokuSize))
                                         {
-                                            S.ElementArray[Index.X, Index.Y] = E;
+                                            S.ElementMatrix[Index.X, Index.Y] = E;
                                         }
                                     }
                                 }
@@ -1780,11 +1780,11 @@ namespace WinFormApp
 
             //
 
-            ElementArray_Initialize();
+            ElementMatrix_Initialize();
 
             foreach (var V in ElementIndexList_Last)
             {
-                ElementArray_Add(V, ElementArray_Last[V.X, V.Y]);
+                ElementMatrix_Add(V, ElementMatrix_Last[V.X, V.Y]);
             }
 
             for (int X = 0; X < Range.Width; X++)
@@ -1795,8 +1795,8 @@ namespace WinFormApp
                 }
             }
 
-            ElementArray_UpdateProbableValuesTable();
-            ElementArray_UpdateCorrectionTable();
+            ElementMatrix_UpdateProbableValuesTable();
+            ElementMatrix_UpdateCorrectionTable();
 
             ThisRecord.GameTime = Record_Last.GameTime;
             ThisRecord.StepCount = Record_Last.StepCount;
@@ -1835,7 +1835,7 @@ namespace WinFormApp
 
             TimerStart();
 
-            ElementArray_RepresentAll();
+            ElementMatrix_RepresentAll();
 
             Judgement();
 
@@ -1904,7 +1904,7 @@ namespace WinFormApp
 
             TimerStart();
 
-            ElementArray_RepresentAll();
+            ElementMatrix_RepresentAll();
 
             Judgement();
 
@@ -1939,14 +1939,14 @@ namespace WinFormApp
 
             foreach (var V in ElementIndexList_Last)
             {
-                ElementArray_Last[V.X, V.Y] = 0;
+                ElementMatrix_Last[V.X, V.Y] = 0;
             }
 
             ElementIndexList_Last.Clear();
 
             foreach (var V in ElementIndexList)
             {
-                ElementArray_Last[V.X, V.Y] = ElementArray[V.X, V.Y];
+                ElementMatrix_Last[V.X, V.Y] = ElementMatrix_GetValue(V);
 
                 ElementIndexList_Last.Add(V);
             }
@@ -1978,7 +1978,7 @@ namespace WinFormApp
             {
                 Point A = ElementIndexList[i];
 
-                Str += "(" + A.X + "," + A.Y + "," + ElementArray[A.X, A.Y] + "," + (SolidFlagTable[A.X, A.Y] ? "1" : "0") + ")";
+                Str += "(" + A.X + "," + A.Y + "," + ElementMatrix_GetValue(A) + "," + (SolidFlagTable[A.X, A.Y] ? "1" : "0") + ")";
             }
             Str += "]</Element>";
 
@@ -2010,9 +2010,9 @@ namespace WinFormApp
                         {
                             for (int Y = 0; Y < Range.Height; Y++)
                             {
-                                if (S.ElementArray[X, Y] != 0)
+                                if (S.ElementMatrix[X, Y] != 0)
                                 {
-                                    StepListString += "(" + X + "," + Y + "," + S.ElementArray[X, Y] + ")";
+                                    StepListString += "(" + X + "," + Y + "," + S.ElementMatrix[X, Y] + ")";
                                 }
                             }
                         }
@@ -2042,9 +2042,9 @@ namespace WinFormApp
                         {
                             for (int Y = 0; Y < Range.Height; Y++)
                             {
-                                if (S.ElementArray[X, Y] != 0)
+                                if (S.ElementMatrix[X, Y] != 0)
                                 {
-                                    StepListString += "(" + X + "," + Y + "," + S.ElementArray[X, Y] + ")";
+                                    StepListString += "(" + X + "," + Y + "," + S.ElementMatrix[X, Y] + ")";
                                 }
                             }
                         }
@@ -2247,7 +2247,7 @@ namespace WinFormApp
 
         // 初始化。
 
-        private void ElementArray_Initialize()
+        private void ElementMatrix_Initialize()
         {
             //
             // 初始化。
@@ -2255,7 +2255,7 @@ namespace WinFormApp
 
             for (int i = 0; i < ElementIndexList.Count; i++)
             {
-                ElementArray[ElementIndexList[i].X, ElementIndexList[i].Y] = 0;
+                ElementMatrix[ElementIndexList[i].X, ElementIndexList[i].Y] = 0;
             }
 
             ElementIndexList.Clear();
@@ -2263,7 +2263,65 @@ namespace WinFormApp
 
         // 索引。
 
-        private Point ElementArray_GetIndex(Point P)
+        private bool ElementMatrix_IndexValid(Point A)
+        {
+            //
+            // 检查指定的索引是否有效。A：索引。
+            //
+
+            try
+            {
+                return (A.X >= 0 && A.X < Range.Width && A.Y >= 0 && A.Y < Range.Height);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private Int32 ElementMatrix_GetValue(Point A)
+        {
+            //
+            // 获取元素矩阵指定的索引的元素的值。A：索引。
+            //
+
+            try
+            {
+                if (ElementMatrix_IndexValid(A))
+                {
+                    return ElementMatrix[A.X, A.Y];
+                }
+
+                return Int32.MinValue;
+            }
+            catch
+            {
+                return Int32.MinValue;
+            }
+        }
+
+        private Int32 ElementMatrix_GetValue(Int32 X, Int32 Y)
+        {
+            //
+            // 获取元素矩阵指定的索引的元素的值。X，Y：索引。
+            //
+
+            try
+            {
+                if (ElementMatrix_IndexValid(new Point(X, Y)))
+                {
+                    return ElementMatrix[X, Y];
+                }
+
+                return Int32.MinValue;
+            }
+            catch
+            {
+                return Int32.MinValue;
+            }
+        }
+
+        private Point ElementMatrix_GetIndex(Point P)
         {
             //
             // 获取绘图容器中的指定坐标所在元素的索引。P：坐标。
@@ -2274,7 +2332,7 @@ namespace WinFormApp
                 Point dP = new Point(P.X - EAryBmpRect.X, P.Y - EAryBmpRect.Y);
                 Point A = new Point((Int32)Math.Floor((double)dP.X / ElementSize), (Int32)Math.Floor((double)dP.Y / ElementSize));
 
-                if (A.X >= 0 && A.X < Range.Width && A.Y >= 0 && A.Y < Range.Height)
+                if (ElementMatrix_IndexValid(A))
                 {
                     return A;
                 }
@@ -2287,9 +2345,45 @@ namespace WinFormApp
             }
         }
 
+        // 添加与移除。
+
+        private void ElementMatrix_Add(Point A, Int32 E)
+        {
+            //
+            // 向元素矩阵添加一个元素。A：索引；E：元素的值。
+            //
+
+            if (E != 0 && ElementMatrix_IndexValid(A))
+            {
+                if (!ElementIndexList.Contains(A))
+                {
+                    ElementMatrix[A.X, A.Y] = E;
+
+                    ElementIndexList.Add(A);
+                }
+            }
+        }
+
+        private void ElementMatrix_RemoveAt(Point A)
+        {
+            //
+            // 从元素矩阵移除一个元素。A：索引。
+            //
+
+            if (ElementMatrix_IndexValid(A))
+            {
+                ElementMatrix[A.X, A.Y] = 0;
+
+                if (ElementIndexList.Contains(A))
+                {
+                    ElementIndexList.Remove(A);
+                }
+            }
+        }
+
         // 颜色。
 
-        private Color ElementArray_GetColor(Int32 E)
+        private Color ElementMatrix_GetColor(Int32 E)
         {
             //
             // 获取元素颜色。E：元素的值。
@@ -2314,42 +2408,6 @@ namespace WinFormApp
             }
         }
 
-        // 添加与移除。
-
-        private void ElementArray_Add(Point A, Int32 E)
-        {
-            //
-            // 向元素矩阵添加一个元素。A：索引；E：元素的值。
-            //
-
-            if (E != 0 && A.X >= 0 && A.X < CAPACITY && A.Y >= 0 && A.Y < CAPACITY)
-            {
-                if (!ElementIndexList.Contains(A))
-                {
-                    ElementArray[A.X, A.Y] = E;
-
-                    ElementIndexList.Add(A);
-                }
-            }
-        }
-
-        private void ElementArray_RemoveAt(Point A)
-        {
-            //
-            // 从元素矩阵移除一个元素。A：索引。
-            //
-
-            if (A.X >= 0 && A.X < CAPACITY && A.Y >= 0 && A.Y < CAPACITY)
-            {
-                ElementArray[A.X, A.Y] = 0;
-
-                if (ElementIndexList.Contains(A))
-                {
-                    ElementIndexList.Remove(A);
-                }
-            }
-        }
-
         // 绘图与呈现。
 
         private Rectangle EAryBmpRect = new Rectangle(); // 元素矩阵位图区域（相对于绘图容器）。
@@ -2358,13 +2416,13 @@ namespace WinFormApp
 
         private Graphics EAryBmpGrap; // 元素矩阵位图绘图。
 
-        private void ElementArray_DrawAtPoint(Point A, bool PresentNow)
+        private void ElementMatrix_DrawAtPoint(Point A, bool PresentNow)
         {
             //
             // 在元素矩阵位图的指定索引处绘制一个元素。A：索引；PresentNow：是否立即呈现此元素，如果为 true，那么将在位图中绘制此元素，并在不重绘整个位图的情况下在容器中绘制此元素，如果为 false，那么将仅在位图中绘制此元素。
             //
 
-            if (A.X >= 0 && A.X < CAPACITY && A.Y >= 0 && A.Y < CAPACITY)
+            if (ElementMatrix_IndexValid(A))
             {
                 Rectangle BmpRect = new Rectangle(new Point(A.X * ElementSize, A.Y * ElementSize), new Size(ElementSize, ElementSize));
 
@@ -2382,7 +2440,7 @@ namespace WinFormApp
 
                 const double ElementClientDistPct = 1.0 / 12.0; // 相邻两元素有效区域的间距与元素边长之比。
 
-                Int32 E = ElementArray[A.X, A.Y];
+                Int32 E = ElementMatrix_GetValue(A);
 
                 bool EIsSolid = SolidFlagTable[A.X, A.Y];
                 UInt32 EProbableValues = ProbableValuesTable[A.X, A.Y];
@@ -2390,9 +2448,9 @@ namespace WinFormApp
 
                 bool AIsPointed = (A == GameUIPointedIndex);
                 bool AIsSelected = (A == OperatingIndex);
-                bool OpIDIsCorrectAtA = (EProbableValues != 0 && (OperatingIndex.X >= 0 && OperatingIndex.X < Range.Width && OperatingIndex.Y >= 0 && OperatingIndex.Y < Range.Height) && Com.BitOperation.BinaryHasBit(EProbableValues, ElementArray[OperatingIndex.X, OperatingIndex.Y]));
+                bool OpIDIsCorrectAtA = (EProbableValues != 0 && (OperatingIndex.X >= 0 && OperatingIndex.X < Range.Width && OperatingIndex.Y >= 0 && OperatingIndex.Y < Range.Height) && Com.BitOperation.BinaryHasBit(EProbableValues, ElementMatrix_GetValue(OperatingIndex)));
                 bool OpNumIsCorrectAtA = (EProbableValues != 0 && Com.BitOperation.BinaryHasBit(EProbableValues, OperatingNumber));
-                bool EIsEqualToOpID = ((OperatingIndex.X >= 0 && OperatingIndex.X < Range.Width && OperatingIndex.Y >= 0 && OperatingIndex.Y < Range.Height) && E == ElementArray[OperatingIndex.X, OperatingIndex.Y]);
+                bool EIsEqualToOpID = ((OperatingIndex.X >= 0 && OperatingIndex.X < Range.Width && OperatingIndex.Y >= 0 && OperatingIndex.Y < Range.Height) && E == ElementMatrix_GetValue(OperatingIndex));
                 bool EIsEqualToOpNum = (E == OperatingNumber);
 
                 Action DrawSplitLine = () =>
@@ -2446,7 +2504,7 @@ namespace WinFormApp
                         IsHighlight = false;
                     }
 
-                    Color Cr_Bk = (IsHighlight ? Com.ColorManipulation.ShiftLightnessByHSL(Me.RecommendColors.Main_DEC, 0.4).ToColor() : ElementArray_GetColor(E));
+                    Color Cr_Bk = (IsHighlight ? Com.ColorManipulation.ShiftLightnessByHSL(Me.RecommendColors.Main_DEC, 0.4).ToColor() : ElementMatrix_GetColor(E));
                     Color Cr_Bdr = Me.RecommendColors.Main.ToColor();
                     Color Cr_Ptd = Me.RecommendColors.Main.AtAlpha(96).ToColor();
                     Color Cr_Str = Com.ColorManipulation.ShiftLightnessByHSL(Cr_Bk, -0.5);
@@ -2523,7 +2581,7 @@ namespace WinFormApp
                         IsBordered = true;
                     }
 
-                    Color Cr_Bk = (IsSolid ? Com.ColorManipulation.GetGrayscaleColor(ElementArray_GetColor(E)) : (IsCorrect ? ElementArray_GetColor(E) : new Com.ColorX(Color.Crimson).AtLightness_HSL(60).ToColor()));
+                    Color Cr_Bk = (IsSolid ? Com.ColorManipulation.GetGrayscaleColor(ElementMatrix_GetColor(E)) : (IsCorrect ? ElementMatrix_GetColor(E) : new Com.ColorX(Color.Crimson).AtLightness_HSL(60).ToColor()));
                     Color Cr_Bdr = (IsCorrect ? Me.RecommendColors.Main.ToColor() : new Com.ColorX(Color.Crimson).AtLightness_HSL(52).ToColor());
                     Color Cr_Ptd = Color.FromArgb(96, GameUIBackColor_DEC);
                     Color Cr_Str = Com.ColorManipulation.ShiftLightnessByHSL((IsCorrect ? Cr_Bk : new Com.ColorX(Color.Crimson).AtLightness_HSL(60).ToColor()), -0.5);
@@ -2600,7 +2658,7 @@ namespace WinFormApp
             }
         }
 
-        private void ElementArray_RepresentAll()
+        private void ElementMatrix_RepresentAll()
         {
             //
             // 更新并呈现元素矩阵包含的所有元素。
@@ -2631,13 +2689,13 @@ namespace WinFormApp
                 {
                     for (int Y = 0; Y < Range.Height; Y++)
                     {
-                        ElementArray_DrawAtPoint(new Point(X, Y), false);
+                        ElementMatrix_DrawAtPoint(new Point(X, Y), false);
                     }
                 }
 
                 //
 
-                ElementArray_UpdateCandidateNumberArea(0, false);
+                ElementMatrix_UpdateCandidateNumberArea(0, false);
 
                 //
 
@@ -2688,7 +2746,7 @@ namespace WinFormApp
             }
         }
 
-        private void ElementArray_PresentAt(Point A)
+        private void ElementMatrix_PresentAt(Point A)
         {
             //
             // 呈现元素矩阵中指定的索引处的一个元素。A：索引。
@@ -2696,9 +2754,9 @@ namespace WinFormApp
 
             if (Panel_Environment.Visible && (Panel_Environment.Width > 0 && Panel_Environment.Height > 0))
             {
-                if (A.X >= 0 && A.X < Range.Width && A.Y >= 0 && A.Y < Range.Height)
+                if (ElementMatrix_IndexValid(A))
                 {
-                    ElementArray_DrawAtPoint(A, true);
+                    ElementMatrix_DrawAtPoint(A, true);
                 }
             }
         }
@@ -2749,7 +2807,7 @@ namespace WinFormApp
 
         #endregion
 
-        #region 元素矩阵高级功能
+        #region 元素矩阵扩展功能
 
         // 候选操作数区域。
 
@@ -2757,7 +2815,7 @@ namespace WinFormApp
         private const double CandidateNumberAreaSize = 1.0; // 候选操作数区域的宽度与高度中的较小者相对于元素边长的倍数。
         private Rectangle CandidateNumberArea = new Rectangle(); // 候选操作数区域（相对于绘图容器）。
 
-        private void ElementArray_UpdateCandidateNumberArea(Int32 UpdateNumber, bool PresentNow)
+        private void ElementMatrix_UpdateCandidateNumberArea(Int32 UpdateNumber, bool PresentNow)
         {
             //
             // 更新候选操作数区域。UpdateNumber：需要更新的候选操作数，0 表示更新所有；PresentNow：是否立即呈现此区域，如果为 true，那么将在位图中绘制此区域，并在不重绘整个位图的情况下在容器中绘制此区域，如果为 false，那么将仅在位图中绘制此区域。
@@ -2791,11 +2849,11 @@ namespace WinFormApp
 
                 const double ElementClientDistPct = 1.0 / 12.0; // 相邻两元素有效区域的间距与元素边长之比。
 
-                Int32 Surplus = ElementArray_GetSurplusOfCandidateNumber(Number);
+                Int32 Surplus = ElementMatrix_GetSurplusOfCandidateNumber(Number);
                 bool IsBordered = (Number == OperatingNumber);
                 bool IsPointed = (Number == GameUIPointedNumber);
 
-                Color Cr_Bk = (Surplus <= 0 ? Com.ColorManipulation.GetGrayscaleColor(ElementArray_GetColor(Number)) : ElementArray_GetColor(Number));
+                Color Cr_Bk = (Surplus <= 0 ? Com.ColorManipulation.GetGrayscaleColor(ElementMatrix_GetColor(Number)) : ElementMatrix_GetColor(Number));
                 Color Cr_Bdr = Me.RecommendColors.Main.ToColor();
                 Color Cr_Ptd = Color.FromArgb(96, GameUIBackColor_DEC);
                 Color Cr_Str = Com.ColorManipulation.ShiftLightnessByHSL(Cr_Bk, -0.5);
@@ -2910,22 +2968,22 @@ namespace WinFormApp
         private UInt32[,] ProbableValuesTable = new UInt32[CAPACITY, CAPACITY]; // 可填值表。
         private bool[,] CorrectionTable = new bool[CAPACITY, CAPACITY]; // 正确性表。
 
-        private void ElementArray_UpdateProbableValuesTable()
+        private void ElementMatrix_UpdateProbableValuesTable()
         {
             //
             // 更新可填值表。
             //
 
-            CalcPVTOfSudoku(ElementArray, ProbableValuesTable);
+            CalcPVTOfSudoku(ElementMatrix, ProbableValuesTable);
         }
 
-        private void ElementArray_UpdateCorrectionTable()
+        private void ElementMatrix_UpdateCorrectionTable()
         {
             //
             // 更新正确性表。
             //
 
-            CalcCTOfSudoku(ElementArray, SolidFlagTable, CorrectionTable);
+            CalcCTOfSudoku(ElementMatrix, SolidFlagTable, CorrectionTable);
         }
 
         // 操作索引，操作数，操作方向。
@@ -2940,7 +2998,7 @@ namespace WinFormApp
 
             set
             {
-                if (value.X >= 0 && value.X < Range.Width && value.Y >= 0 && value.Y < Range.Height)
+                if (ElementMatrix_IndexValid(value))
                 {
                     _OperatingIndex = value;
                 }
@@ -2974,7 +3032,7 @@ namespace WinFormApp
             }
         }
 
-        private Int32 ElementArray_GetCandidateNumberAt(Point P)
+        private Int32 ElementMatrix_GetCandidateNumberAt(Point P)
         {
             //
             // 获取绘图容器中的指定坐标所在的候选操作数。P：坐标。
@@ -3002,7 +3060,7 @@ namespace WinFormApp
             return Number;
         }
 
-        private void ElementArray_ResetOperatingIndexAndNumber()
+        private void ElementMatrix_ResetOperatingIndexAndNumber()
         {
             //
             // 重置当前的操作索引与操作数，重绘整个位图并进行判定。
@@ -3010,19 +3068,19 @@ namespace WinFormApp
 
             if (!GameIsWin && Timer_Timer.Enabled)
             {
-                if ((OperatingIndex.X >= 0 && OperatingIndex.X < Range.Width && OperatingIndex.Y >= 0 && OperatingIndex.Y < Range.Height) || (OperatingNumber >= 0 && OperatingNumber <= SudokuSize))
+                if (ElementMatrix_IndexValid(OperatingIndex) || (OperatingNumber >= 0 && OperatingNumber <= SudokuSize))
                 {
                     OperatingIndex = new Point(-1, -1);
                     OperatingNumber = -1;
 
-                    ElementArray_RepresentAll();
+                    ElementMatrix_RepresentAll();
 
                     Judgement();
                 }
             }
         }
 
-        private void ElementArray_BasicLogicalOperation(Point A, bool IsFinal)
+        private void ElementMatrix_BasicLogicalOperation(Point A, bool IsFinal)
         {
             //
             // 对指定索引的基本逻辑操作。A：索引；IsFinal：是否是最终操作，如果是，将重绘整个位图并进行判定。
@@ -3030,13 +3088,13 @@ namespace WinFormApp
 
             if (!GameIsWin && Timer_Timer.Enabled)
             {
-                if (A.X >= 0 && A.X < Range.Width && A.Y >= 0 && A.Y < Range.Height)
+                if (ElementMatrix_IndexValid(A))
                 {
                     Step S = new Step();
 
                     Action CopyStep = () =>
                     {
-                        S.ElementArray = GetCopyOfArray(ElementArray);
+                        S.ElementMatrix = GetCopyOfArray(ElementMatrix);
                     };
 
                     Action SaveStep = () =>
@@ -3045,8 +3103,8 @@ namespace WinFormApp
 
                         ThisRecord.StepCount += 1;
 
-                        ElementArray_UpdateProbableValuesTable();
-                        ElementArray_UpdateCorrectionTable();
+                        ElementMatrix_UpdateProbableValuesTable();
+                        ElementMatrix_UpdateCorrectionTable();
                     };
 
                     if (OperatingIndex == A)
@@ -3059,7 +3117,7 @@ namespace WinFormApp
 
                         if (!SolidFlagTable[OperatingIndex.X, OperatingIndex.Y])
                         {
-                            Int32 E = ElementArray[OperatingIndex.X, OperatingIndex.Y];
+                            Int32 E = ElementMatrix_GetValue(OperatingIndex);
 
                             if (E == 0)
                             {
@@ -3069,11 +3127,11 @@ namespace WinFormApp
                                 }
                                 else if (OperatingNumber >= 1 && OperatingNumber <= SudokuSize)
                                 {
-                                    if (ElementArray_GetSurplusOfCandidateNumber(OperatingNumber) > 0)
+                                    if (ElementMatrix_GetSurplusOfCandidateNumber(OperatingNumber) > 0)
                                     {
                                         CopyStep();
 
-                                        ElementArray_Add(OperatingIndex, OperatingNumber);
+                                        ElementMatrix_Add(OperatingIndex, OperatingNumber);
 
                                         SaveStep();
 
@@ -3091,7 +3149,7 @@ namespace WinFormApp
                                 {
                                     CopyStep();
 
-                                    ElementArray_RemoveAt(OperatingIndex);
+                                    ElementMatrix_RemoveAt(OperatingIndex);
 
                                     SaveStep();
 
@@ -3103,7 +3161,7 @@ namespace WinFormApp
                                     {
                                         CopyStep();
 
-                                        ElementArray_RemoveAt(OperatingIndex);
+                                        ElementMatrix_RemoveAt(OperatingIndex);
 
                                         SaveStep();
 
@@ -3111,12 +3169,12 @@ namespace WinFormApp
                                     }
                                     else if (OperatingNumber >= 1 && OperatingNumber <= SudokuSize)
                                     {
-                                        if (ElementArray_GetSurplusOfCandidateNumber(OperatingNumber) > 0)
+                                        if (ElementMatrix_GetSurplusOfCandidateNumber(OperatingNumber) > 0)
                                         {
                                             CopyStep();
 
-                                            ElementArray_RemoveAt(OperatingIndex);
-                                            ElementArray_Add(OperatingIndex, OperatingNumber);
+                                            ElementMatrix_RemoveAt(OperatingIndex);
+                                            ElementMatrix_Add(OperatingIndex, OperatingNumber);
 
                                             SaveStep();
 
@@ -3143,14 +3201,14 @@ namespace WinFormApp
 
                 if (IsFinal)
                 {
-                    ElementArray_RepresentAll();
+                    ElementMatrix_RepresentAll();
 
                     Judgement();
                 }
             }
         }
 
-        private void ElementArray_BasicLogicalOperation(Int32 Number, bool IsFinal)
+        private void ElementMatrix_BasicLogicalOperation(Int32 Number, bool IsFinal)
         {
             //
             // 对指定操作数的基本逻辑操作。Number：操作数；IsFinal：是否是最终操作，如果是，将重绘整个位图并进行判定。
@@ -3164,7 +3222,7 @@ namespace WinFormApp
 
                     Action CopyStep = () =>
                     {
-                        S.ElementArray = GetCopyOfArray(ElementArray);
+                        S.ElementMatrix = GetCopyOfArray(ElementMatrix);
                     };
 
                     Action SaveStep = () =>
@@ -3173,8 +3231,8 @@ namespace WinFormApp
 
                         ThisRecord.StepCount += 1;
 
-                        ElementArray_UpdateProbableValuesTable();
-                        ElementArray_UpdateCorrectionTable();
+                        ElementMatrix_UpdateProbableValuesTable();
+                        ElementMatrix_UpdateCorrectionTable();
                     };
 
                     if (OperatingNumber == Number)
@@ -3185,9 +3243,9 @@ namespace WinFormApp
                     {
                         OperatingNumber = Number;
 
-                        if (OperatingIndex.X >= 0 && OperatingIndex.X < Range.Width && OperatingIndex.Y >= 0 && OperatingIndex.Y < Range.Height)
+                        if (ElementMatrix_IndexValid(OperatingIndex))
                         {
-                            Int32 E = ElementArray[OperatingIndex.X, OperatingIndex.Y];
+                            Int32 E = ElementMatrix_GetValue(OperatingIndex);
 
                             if (Number == 0)
                             {
@@ -3197,7 +3255,7 @@ namespace WinFormApp
                                     {
                                         CopyStep();
 
-                                        ElementArray_RemoveAt(OperatingIndex);
+                                        ElementMatrix_RemoveAt(OperatingIndex);
 
                                         SaveStep();
 
@@ -3213,11 +3271,11 @@ namespace WinFormApp
                                 {
                                     if (E == 0)
                                     {
-                                        if (ElementArray_GetSurplusOfCandidateNumber(OperatingNumber) > 0)
+                                        if (ElementMatrix_GetSurplusOfCandidateNumber(OperatingNumber) > 0)
                                         {
                                             CopyStep();
 
-                                            ElementArray_Add(OperatingIndex, OperatingNumber);
+                                            ElementMatrix_Add(OperatingIndex, OperatingNumber);
 
                                             SaveStep();
                                         }
@@ -3230,7 +3288,7 @@ namespace WinFormApp
                                         {
                                             CopyStep();
 
-                                            ElementArray_RemoveAt(OperatingIndex);
+                                            ElementMatrix_RemoveAt(OperatingIndex);
 
                                             SaveStep();
 
@@ -3238,12 +3296,12 @@ namespace WinFormApp
                                         }
                                         else
                                         {
-                                            if (ElementArray_GetSurplusOfCandidateNumber(OperatingNumber) > 0)
+                                            if (ElementMatrix_GetSurplusOfCandidateNumber(OperatingNumber) > 0)
                                             {
                                                 CopyStep();
 
-                                                ElementArray_RemoveAt(OperatingIndex);
-                                                ElementArray_Add(OperatingIndex, OperatingNumber);
+                                                ElementMatrix_RemoveAt(OperatingIndex);
+                                                ElementMatrix_Add(OperatingIndex, OperatingNumber);
 
                                                 SaveStep();
 
@@ -3269,14 +3327,14 @@ namespace WinFormApp
 
                 if (IsFinal)
                 {
-                    ElementArray_RepresentAll();
+                    ElementMatrix_RepresentAll();
 
                     Judgement();
                 }
             }
         }
 
-        private void ElementArray_KeyOperation(Keys KeyCode)
+        private void ElementMatrix_KeyOperation(Keys KeyCode)
         {
             //
             // 对指定键盘键的操作。KeyCode：键盘键代码。
@@ -3288,7 +3346,7 @@ namespace WinFormApp
                 {
                     Point A = OperatingIndex;
 
-                    if (A.X >= 0 && A.X < Range.Width && A.Y >= 0 && A.Y < Range.Height)
+                    if (ElementMatrix_IndexValid(A))
                     {
                         switch (Direction)
                         {
@@ -3346,28 +3404,28 @@ namespace WinFormApp
                         A = new Point(0, 0);
                     }
 
-                    ElementArray_BasicLogicalOperation(A, true);
+                    ElementMatrix_BasicLogicalOperation(A, true);
                 };
 
                 Action<Int32> KeyDownNumber = (Number) =>
                 {
                     if (Number >= 0 && Number <= SudokuSize)
                     {
-                        if ((OperatingIndex.X >= 0 && OperatingIndex.X < Range.Width && OperatingIndex.Y >= 0 && OperatingIndex.Y < Range.Height))
+                        if (ElementMatrix_IndexValid(OperatingIndex))
                         {
                             if (!SolidFlagTable[OperatingIndex.X, OperatingIndex.Y])
                             {
-                                Int32 E = ElementArray[OperatingIndex.X, OperatingIndex.Y];
+                                Int32 E = ElementMatrix_GetValue(OperatingIndex);
 
                                 if ((E == 0 && Number != 0) || E != 0)
                                 {
                                     Point A = OperatingIndex;
 
-                                    ElementArray_BasicLogicalOperation(Number, true);
+                                    ElementMatrix_BasicLogicalOperation(Number, true);
 
                                     if (!GameIsWin)
                                     {
-                                        ElementArray_BasicLogicalOperation(A, true);
+                                        ElementMatrix_BasicLogicalOperation(A, true);
                                     }
                                 }
                             }
@@ -3427,7 +3485,7 @@ namespace WinFormApp
         private Point _MouseDownOpID = new Point(-1, -1); // 鼠标按下（或手指轻触）时鼠标指针所在的索引。
         private Int32 _MouseDownOpNum = -1; // 鼠标按下（或手指轻触）时鼠标指针所在的操作数。
 
-        private void ElementArray_MouseDownOperation(Point MouseDownPt)
+        private void ElementMatrix_MouseDownOperation(Point MouseDownPt)
         {
             //
             // 对指定坐标的鼠标按下操作。MouseDownPt：鼠标按下（或手指轻触）时光标在绘图容器的坐标。
@@ -3435,14 +3493,14 @@ namespace WinFormApp
 
             if (!GameIsWin && Timer_Timer.Enabled)
             {
-                Point A = ElementArray_GetIndex(MouseDownPt);
-                Int32 Number = ElementArray_GetCandidateNumberAt(MouseDownPt);
+                Point A = ElementMatrix_GetIndex(MouseDownPt);
+                Int32 Number = ElementMatrix_GetCandidateNumberAt(MouseDownPt);
 
-                if (A.X >= 0 && A.X < Range.Width && A.Y >= 0 && A.Y < Range.Height)
+                if (ElementMatrix_IndexValid(A))
                 {
                     if (OperationMode == OperationModes.Mouse)
                     {
-                        ElementArray_BasicLogicalOperation(A, true);
+                        ElementMatrix_BasicLogicalOperation(A, true);
                     }
                     else if (OperationMode == OperationModes.Touch)
                     {
@@ -3453,7 +3511,7 @@ namespace WinFormApp
                 {
                     if (OperationMode == OperationModes.Mouse)
                     {
-                        ElementArray_BasicLogicalOperation(Number, true);
+                        ElementMatrix_BasicLogicalOperation(Number, true);
                     }
                     else if (OperationMode == OperationModes.Touch)
                     {
@@ -3464,13 +3522,13 @@ namespace WinFormApp
                 {
                     if (OperationMode == OperationModes.Mouse)
                     {
-                        ElementArray_ResetOperatingIndexAndNumber();
+                        ElementMatrix_ResetOperatingIndexAndNumber();
                     }
                 }
             }
         }
 
-        private void ElementArray_MouseUpOperation(Point MouseUpPt)
+        private void ElementMatrix_MouseUpOperation(Point MouseUpPt)
         {
             //
             // 对指定坐标的鼠标释放操作。MouseUpPt：鼠标释放（或手指离开）时光标在绘图容器的坐标。
@@ -3480,29 +3538,29 @@ namespace WinFormApp
             {
                 if (!GameIsWin && Timer_Timer.Enabled)
                 {
-                    Point A = ElementArray_GetIndex(MouseUpPt);
-                    Int32 Number = ElementArray_GetCandidateNumberAt(MouseUpPt);
+                    Point A = ElementMatrix_GetIndex(MouseUpPt);
+                    Int32 Number = ElementMatrix_GetCandidateNumberAt(MouseUpPt);
 
                     bool _MouseDownOpIDIsValid = (_MouseDownOpID.X >= 0 && _MouseDownOpID.X < Range.Width && _MouseDownOpID.Y >= 0 && _MouseDownOpID.Y < Range.Height);
                     bool _MouseDownOpNumIsValid = (_MouseDownOpNum >= 0 && _MouseDownOpNum <= SudokuSize);
 
                     if (_MouseDownOpIDIsValid || _MouseDownOpNumIsValid)
                     {
-                        if (A.X >= 0 && A.X < Range.Width && A.Y >= 0 && A.Y < Range.Height)
+                        if (ElementMatrix_IndexValid(A))
                         {
                             if (A == _MouseDownOpID)
                             {
-                                ElementArray_BasicLogicalOperation(A, true);
+                                ElementMatrix_BasicLogicalOperation(A, true);
                             }
                             else
                             {
                                 if (!SolidFlagTable[A.X, A.Y])
                                 {
-                                    Int32 E = ElementArray[A.X, A.Y];
+                                    Int32 E = ElementMatrix_GetValue(A);
 
                                     if (_MouseDownOpIDIsValid)
                                     {
-                                        Int32 _Num = ElementArray[_MouseDownOpID.X, _MouseDownOpID.Y];
+                                        Int32 _Num = ElementMatrix_GetValue(_MouseDownOpID);
 
                                         if (!SolidFlagTable[_MouseDownOpID.X, _MouseDownOpID.Y] && _Num != 0)
                                         {
@@ -3510,31 +3568,31 @@ namespace WinFormApp
                                             {
                                                 if (OperatingIndex != _MouseDownOpID)
                                                 {
-                                                    ElementArray_BasicLogicalOperation(_MouseDownOpID, false);
+                                                    ElementMatrix_BasicLogicalOperation(_MouseDownOpID, false);
                                                 }
 
-                                                ElementArray_BasicLogicalOperation(0, false);
+                                                ElementMatrix_BasicLogicalOperation(0, false);
 
-                                                ElementArray_BasicLogicalOperation(A, false);
-                                                ElementArray_BasicLogicalOperation(_Num, true);
+                                                ElementMatrix_BasicLogicalOperation(A, false);
+                                                ElementMatrix_BasicLogicalOperation(_Num, true);
                                             }
                                             else
                                             {
                                                 if (OperatingIndex != _MouseDownOpID)
                                                 {
-                                                    ElementArray_BasicLogicalOperation(_MouseDownOpID, false);
+                                                    ElementMatrix_BasicLogicalOperation(_MouseDownOpID, false);
                                                 }
 
-                                                ElementArray_BasicLogicalOperation(0, false);
+                                                ElementMatrix_BasicLogicalOperation(0, false);
 
-                                                ElementArray_BasicLogicalOperation(A, false);
-                                                ElementArray_BasicLogicalOperation(0, false);
+                                                ElementMatrix_BasicLogicalOperation(A, false);
+                                                ElementMatrix_BasicLogicalOperation(0, false);
 
-                                                ElementArray_BasicLogicalOperation(_MouseDownOpID, false);
-                                                ElementArray_BasicLogicalOperation(E, false);
+                                                ElementMatrix_BasicLogicalOperation(_MouseDownOpID, false);
+                                                ElementMatrix_BasicLogicalOperation(E, false);
 
-                                                ElementArray_BasicLogicalOperation(A, false);
-                                                ElementArray_BasicLogicalOperation(_Num, true);
+                                                ElementMatrix_BasicLogicalOperation(A, false);
+                                                ElementMatrix_BasicLogicalOperation(_Num, true);
                                             }
                                         }
                                     }
@@ -3542,10 +3600,10 @@ namespace WinFormApp
                                     {
                                         if (OperatingIndex != A)
                                         {
-                                            ElementArray_BasicLogicalOperation(A, false);
+                                            ElementMatrix_BasicLogicalOperation(A, false);
                                         }
 
-                                        ElementArray_BasicLogicalOperation(_MouseDownOpNum, true);
+                                        ElementMatrix_BasicLogicalOperation(_MouseDownOpNum, true);
                                     }
                                 }
                             }
@@ -3554,22 +3612,22 @@ namespace WinFormApp
                         {
                             if (Number == _MouseDownOpNum)
                             {
-                                ElementArray_BasicLogicalOperation(Number, true);
+                                ElementMatrix_BasicLogicalOperation(Number, true);
                             }
                             else
                             {
                                 if (_MouseDownOpIDIsValid)
                                 {
-                                    Int32 _Num = ElementArray[_MouseDownOpID.X, _MouseDownOpID.Y];
+                                    Int32 _Num = ElementMatrix_GetValue(_MouseDownOpID);
 
                                     if (!SolidFlagTable[_MouseDownOpID.X, _MouseDownOpID.Y] && _Num != 0)
                                     {
                                         if (OperatingIndex != _MouseDownOpID)
                                         {
-                                            ElementArray_BasicLogicalOperation(_MouseDownOpID, false);
+                                            ElementMatrix_BasicLogicalOperation(_MouseDownOpID, false);
                                         }
 
-                                        ElementArray_BasicLogicalOperation(0, true);
+                                        ElementMatrix_BasicLogicalOperation(0, true);
                                     }
                                 }
                             }
@@ -3578,31 +3636,31 @@ namespace WinFormApp
                         {
                             if (_MouseDownOpIDIsValid)
                             {
-                                Int32 _Num = ElementArray[_MouseDownOpID.X, _MouseDownOpID.Y];
+                                Int32 _Num = ElementMatrix_GetValue(_MouseDownOpID);
 
                                 if (!SolidFlagTable[_MouseDownOpID.X, _MouseDownOpID.Y] && _Num != 0)
                                 {
                                     if (OperatingIndex != _MouseDownOpID)
                                     {
-                                        ElementArray_BasicLogicalOperation(_MouseDownOpID, false);
+                                        ElementMatrix_BasicLogicalOperation(_MouseDownOpID, false);
                                     }
 
-                                    ElementArray_BasicLogicalOperation(0, true);
+                                    ElementMatrix_BasicLogicalOperation(0, true);
                                 }
                                 else
                                 {
-                                    ElementArray_ResetOperatingIndexAndNumber();
+                                    ElementMatrix_ResetOperatingIndexAndNumber();
                                 }
                             }
                             else
                             {
-                                ElementArray_ResetOperatingIndexAndNumber();
+                                ElementMatrix_ResetOperatingIndexAndNumber();
                             }
                         }
                     }
                     else
                     {
-                        ElementArray_ResetOperatingIndexAndNumber();
+                        ElementMatrix_ResetOperatingIndexAndNumber();
                     }
 
                     _MouseDownOpID = new Point(-1, -1);
@@ -3613,13 +3671,13 @@ namespace WinFormApp
 
         // 计算与判断。
 
-        private bool ElementArray_SudokuIsCompleted()
+        private bool ElementMatrix_SudokuIsCompleted()
         {
             //
             // 依据已经更新的 CorrectionTable，判断数独是否已经填充完毕并且正确。
             //
 
-            if (GetZeroCountOfArray(ElementArray, Range) == 0)
+            if (GetZeroCountOfArray(ElementMatrix, Range) == 0)
             {
                 for (int X = 0; X < Range.Width; X++)
                 {
@@ -3638,7 +3696,7 @@ namespace WinFormApp
             return false;
         }
 
-        private Int32 ElementArray_GetSurplusOfCandidateNumber(Int32 Number)
+        private Int32 ElementMatrix_GetSurplusOfCandidateNumber(Int32 Number)
         {
             //
             // 获取指定候选操作数的剩余量。Number：候选操作数。
@@ -3646,7 +3704,7 @@ namespace WinFormApp
 
             if (Number >= 1 && Number <= SudokuSize)
             {
-                return (SudokuSize - GetCertainIndexListOfArray(ElementArray, Range, Number).Count);
+                return (SudokuSize - GetCertainIndexListOfArray(ElementMatrix, Range, Number).Count);
             }
 
             return -1;
@@ -4169,12 +4227,12 @@ namespace WinFormApp
                 {
                     SolidFlagTable[X, Y] = (Sudoku[X, Y] != 0);
 
-                    ElementArray_Add(new Point(X, Y), Sudoku[X, Y]);
+                    ElementMatrix_Add(new Point(X, Y), Sudoku[X, Y]);
                 }
             }
 
-            ElementArray_UpdateProbableValuesTable();
-            ElementArray_UpdateCorrectionTable();
+            ElementMatrix_UpdateProbableValuesTable();
+            ElementMatrix_UpdateCorrectionTable();
         }
 
         #endregion
@@ -4270,7 +4328,7 @@ namespace WinFormApp
 
         private struct Step // 操作步骤。
         {
-            public Int32[,] ElementArray; // 元素矩阵。
+            public Int32[,] ElementMatrix; // 元素矩阵。
         }
 
         private List<Step> StepList_Previous = new List<Step>(0); // 操作步骤列表（之前的）。
@@ -4317,7 +4375,7 @@ namespace WinFormApp
                 Step Previous = StepList_Previous[StepList_Previous.Count - 1];
                 Step S = new Step();
 
-                S.ElementArray = GetCopyOfArray(ElementArray);
+                S.ElementMatrix = GetCopyOfArray(ElementMatrix);
 
                 StepList_Next.Add(S);
 
@@ -4327,17 +4385,17 @@ namespace WinFormApp
 
                 List<Point> ElementIndexList_Copy = new List<Point>(ElementIndexList);
 
-                ElementArray_Initialize();
+                ElementMatrix_Initialize();
 
                 for (int X = 0; X < Range.Width; X++)
                 {
                     for (int Y = 0; Y < Range.Height; Y++)
                     {
-                        Int32 E = Previous.ElementArray[X, Y];
+                        Int32 E = Previous.ElementMatrix[X, Y];
 
                         if (E != 0)
                         {
-                            ElementArray_Add(new Point(X, Y), E);
+                            ElementMatrix_Add(new Point(X, Y), E);
                         }
                     }
                 }
@@ -4353,10 +4411,10 @@ namespace WinFormApp
                 OperatingIndex = new Point(-1, -1);
                 OperatingNumber = -1;
 
-                ElementArray_UpdateProbableValuesTable();
-                ElementArray_UpdateCorrectionTable();
+                ElementMatrix_UpdateProbableValuesTable();
+                ElementMatrix_UpdateCorrectionTable();
 
-                ElementArray_RepresentAll();
+                ElementMatrix_RepresentAll();
 
                 Judgement();
             }
@@ -4380,7 +4438,7 @@ namespace WinFormApp
                 Step Next = StepList_Next[StepList_Next.Count - 1];
                 Step S = new Step();
 
-                S.ElementArray = GetCopyOfArray(ElementArray);
+                S.ElementMatrix = GetCopyOfArray(ElementMatrix);
 
                 StepList_Previous.Add(S);
 
@@ -4390,17 +4448,17 @@ namespace WinFormApp
 
                 List<Point> ElementIndexList_Copy = new List<Point>(ElementIndexList);
 
-                ElementArray_Initialize();
+                ElementMatrix_Initialize();
 
                 for (int X = 0; X < Range.Width; X++)
                 {
                     for (int Y = 0; Y < Range.Height; Y++)
                     {
-                        Int32 E = Next.ElementArray[X, Y];
+                        Int32 E = Next.ElementMatrix[X, Y];
 
                         if (E != 0)
                         {
-                            ElementArray_Add(new Point(X, Y), E);
+                            ElementMatrix_Add(new Point(X, Y), E);
                         }
                     }
                 }
@@ -4416,10 +4474,10 @@ namespace WinFormApp
                 OperatingIndex = new Point(-1, -1);
                 OperatingNumber = -1;
 
-                ElementArray_UpdateProbableValuesTable();
-                ElementArray_UpdateCorrectionTable();
+                ElementMatrix_UpdateProbableValuesTable();
+                ElementMatrix_UpdateCorrectionTable();
 
-                ElementArray_RepresentAll();
+                ElementMatrix_RepresentAll();
 
                 Judgement();
             }
@@ -4446,7 +4504,7 @@ namespace WinFormApp
 
             if (!GameIsWin)
             {
-                if (ElementArray_SudokuIsCompleted())
+                if (ElementMatrix_SudokuIsCompleted())
                 {
                     GameIsWin = true;
 
@@ -4455,7 +4513,7 @@ namespace WinFormApp
 
                     TimerStop();
 
-                    ElementArray_RepresentAll();
+                    ElementMatrix_RepresentAll();
 
                     ThisRecord.OrderValue = (Int32)Order;
                     ThisRecord.DifficultyLevel = DifficultyLevel;
@@ -4507,7 +4565,7 @@ namespace WinFormApp
 
                         TimerStart();
 
-                        ElementArray_RepresentAll();
+                        ElementMatrix_RepresentAll();
 
                         Judgement();
                     }
@@ -4560,7 +4618,7 @@ namespace WinFormApp
                     {
                         if (Timer_Timer.Enabled)
                         {
-                            ElementArray_BasicLogicalOperation(0, true);
+                            ElementMatrix_BasicLogicalOperation(0, true);
                         }
                     }
                     break;
@@ -4584,7 +4642,7 @@ namespace WinFormApp
 
                         TimerStop();
 
-                        ElementArray_RepresentAll();
+                        ElementMatrix_RepresentAll();
 
                         RepaintCurBmp();
 
@@ -4603,7 +4661,7 @@ namespace WinFormApp
                     {
                         TimerStart();
 
-                        ElementArray_RepresentAll();
+                        ElementMatrix_RepresentAll();
 
                         Judgement();
 
@@ -4645,7 +4703,7 @@ namespace WinFormApp
 
                         ThisRecord = new Record();
 
-                        ElementArray_Initialize();
+                        ElementMatrix_Initialize();
 
                         CreateSudoku();
 
@@ -4658,7 +4716,7 @@ namespace WinFormApp
 
                         TimerStart();
 
-                        ElementArray_RepresentAll();
+                        ElementMatrix_RepresentAll();
 
                         PictureBox_Erase.Enabled = true;
 
@@ -5032,7 +5090,7 @@ namespace WinFormApp
 
             //
 
-            ElementArray_Initialize();
+            ElementMatrix_Initialize();
 
             //
 
@@ -5099,7 +5157,7 @@ namespace WinFormApp
 
             RepaintCurBmp();
 
-            ElementArray_RepresentAll();
+            ElementMatrix_RepresentAll();
         }
 
         private void ExitGameUI()
@@ -5117,7 +5175,7 @@ namespace WinFormApp
 
             //
 
-            ElementArray_Initialize();
+            ElementMatrix_Initialize();
 
             //
 
@@ -5158,7 +5216,7 @@ namespace WinFormApp
 
                         //
 
-                        Point A = ElementArray_GetIndex(CurPtOfCtrl);
+                        Point A = ElementMatrix_GetIndex(CurPtOfCtrl);
 
                         if (GameUIPointedIndex != A)
                         {
@@ -5173,13 +5231,13 @@ namespace WinFormApp
                                 GameUIPointedIndex = new Point(-1, -1);
                             }
 
-                            ElementArray_PresentAt(LastPointedIndex);
-                            ElementArray_PresentAt(GameUIPointedIndex);
+                            ElementMatrix_PresentAt(LastPointedIndex);
+                            ElementMatrix_PresentAt(GameUIPointedIndex);
                         }
 
                         //
 
-                        Int32 Number = ElementArray_GetCandidateNumberAt(CurPtOfCtrl);
+                        Int32 Number = ElementMatrix_GetCandidateNumberAt(CurPtOfCtrl);
 
                         if (GameUIPointedNumber != Number)
                         {
@@ -5194,8 +5252,8 @@ namespace WinFormApp
                                 GameUIPointedNumber = -1;
                             }
 
-                            ElementArray_UpdateCandidateNumberArea(LastPointedNumber, true);
-                            ElementArray_UpdateCandidateNumberArea(GameUIPointedNumber, true);
+                            ElementMatrix_UpdateCandidateNumberArea(LastPointedNumber, true);
+                            ElementMatrix_UpdateCandidateNumberArea(GameUIPointedNumber, true);
                         }
                     }
                 }
@@ -5217,16 +5275,16 @@ namespace WinFormApp
                         Point LastPointedIndex = GameUIPointedIndex;
                         GameUIPointedIndex = new Point(-1, -1);
 
-                        ElementArray_PresentAt(LastPointedIndex);
-                        ElementArray_PresentAt(GameUIPointedIndex);
+                        ElementMatrix_PresentAt(LastPointedIndex);
+                        ElementMatrix_PresentAt(GameUIPointedIndex);
 
                         //
 
                         Int32 LastPointedNumber = GameUIPointedNumber;
                         GameUIPointedNumber = -1;
 
-                        ElementArray_UpdateCandidateNumberArea(LastPointedNumber, true);
-                        ElementArray_UpdateCandidateNumberArea(GameUIPointedNumber, true);
+                        ElementMatrix_UpdateCandidateNumberArea(LastPointedNumber, true);
+                        ElementMatrix_UpdateCandidateNumberArea(GameUIPointedNumber, true);
                     }
                 }
             }
@@ -5249,7 +5307,7 @@ namespace WinFormApp
 
                     Point CurPtOfCtrl = Com.Geometry.GetCursorPositionOfControl(Panel_Environment);
 
-                    ElementArray_MouseDownOperation(CurPtOfCtrl);
+                    ElementMatrix_MouseDownOperation(CurPtOfCtrl);
                 }
             }
         }
@@ -5271,7 +5329,7 @@ namespace WinFormApp
 
                     Point CurPtOfCtrl = Com.Geometry.GetCursorPositionOfControl(Panel_Environment);
 
-                    ElementArray_MouseUpOperation(CurPtOfCtrl);
+                    ElementMatrix_MouseUpOperation(CurPtOfCtrl);
                 }
             }
         }
@@ -5308,7 +5366,7 @@ namespace WinFormApp
                                     case Keys.PageUp: Interrupt(InterruptActions.Undo); break;
                                     case Keys.PageDown: Interrupt(InterruptActions.Redo); break;
 
-                                    default: ElementArray_KeyOperation(e.KeyCode); break;
+                                    default: ElementMatrix_KeyOperation(e.KeyCode); break;
                                 }
                             }
                         }
@@ -5429,7 +5487,7 @@ namespace WinFormApp
             //
 
             Rectangle Rect_Total = new Rectangle(new Point(0, 0), new Size(Math.Max(1, Panel_Current.Width), Math.Max(1, Panel_Current.Height)));
-            Rectangle Rect_Current = new Rectangle(Rect_Total.Location, new Size((Int32)Math.Max(2, Math.Min(1, (double)(ShowNotes ? CorrectNumberCount : SudokuVolume - SolidNumberCount - GetZeroCountOfArray(ElementArray, Range)) / (SudokuVolume - SolidNumberCount)) * Rect_Total.Width), Rect_Total.Height));
+            Rectangle Rect_Current = new Rectangle(Rect_Total.Location, new Size((Int32)Math.Max(2, Math.Min(1, (double)(ShowNotes ? CorrectNumberCount : SudokuVolume - SolidNumberCount - GetZeroCountOfArray(ElementMatrix, Range)) / (SudokuVolume - SolidNumberCount)) * Rect_Total.Width), Rect_Total.Height));
 
             Color RectCr_Total = Me.RecommendColors.Background.ToColor(), RectCr_Current = Me.RecommendColors.Border.ToColor();
 
@@ -5468,7 +5526,7 @@ namespace WinFormApp
             RectangleF StringRect_Score = new RectangleF();
             StringRect_Score.Size = CurBmpGrap.MeasureString(StringText_Score, StringFont_Score);
 
-            string StringText_Complete = (ShowNotes ? "已完成: " : "已填入: "), StringText_Complete_Val = Math.Max(0, (ShowNotes ? CorrectNumberCount : SudokuVolume - SolidNumberCount - GetZeroCountOfArray(ElementArray, Range))) + " / " + Math.Max(0, SudokuVolume - SolidNumberCount);
+            string StringText_Complete = (ShowNotes ? "已完成: " : "已填入: "), StringText_Complete_Val = Math.Max(0, (ShowNotes ? CorrectNumberCount : SudokuVolume - SolidNumberCount - GetZeroCountOfArray(ElementMatrix, Range))) + " / " + Math.Max(0, SudokuVolume - SolidNumberCount);
             Color StringColor_Complete = Me.RecommendColors.Text.ToColor(), StringColor_Complete_Val = Me.RecommendColors.Text_INC.ToColor();
             Font StringFont_Complete = new Font("微软雅黑", 12F, FontStyle.Regular, GraphicsUnit.Point, 134), StringFont_Complete_Val = new Font("微软雅黑", 12F, FontStyle.Bold, GraphicsUnit.Point, 134);
             RectangleF StringRect_Complete = new RectangleF(), StringRect_Complete_Val = new RectangleF();

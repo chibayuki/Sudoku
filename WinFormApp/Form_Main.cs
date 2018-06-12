@@ -2,7 +2,7 @@
 Copyright © 2013-2018 chibayuki@foxmail.com
 
 数独
-Version 7.1.17000.4433.R12.180612-0000
+Version 7.1.17000.4433.R12.180613-0000
 
 This file is part of 数独
 
@@ -39,7 +39,7 @@ namespace WinFormApp
         private static readonly Int32 BuildNumber = new Version(Application.ProductVersion).Build; // 版本号。
         private static readonly Int32 BuildRevision = new Version(Application.ProductVersion).Revision; // 修订版本。
         private static readonly string LabString = "R12"; // 分支名。
-        private static readonly string BuildTime = "180612-0000"; // 编译时间。
+        private static readonly string BuildTime = "180613-0000"; // 编译时间。
 
         //
 
@@ -6066,8 +6066,6 @@ namespace WinFormApp
 
         private Bitmap DLTrbBmp; // 难度等级调节器位图。
 
-        private Graphics DLTrbBmpGrap; // 难度等级调节器位图绘图。
-
         private Size DLTrbSliderSize => new Size(2, Panel_DifficultyLevelAdjustment.Height); // 难度等级调节器滑块大小。
 
         private void UpdateDLTrb()
@@ -6083,75 +6081,76 @@ namespace WinFormApp
 
             DLTrbBmp = new Bitmap(Math.Max(1, Panel_DifficultyLevelAdjustment.Width), Math.Max(1, Panel_DifficultyLevelAdjustment.Height));
 
-            DLTrbBmpGrap = Graphics.FromImage(DLTrbBmp);
-
-            DLTrbBmpGrap.Clear(Panel_DifficultyLevelAdjustment.BackColor);
-
-            //
-
-            Color Color_Slider, Color_ScrollBar_Current, Color_ScrollBar_Unavailable;
-
-            if (Com.Geometry.CursorIsInControl(Panel_DifficultyLevelAdjustment) || DifficultyLevelIsAdjusting)
+            using (Graphics DLTrbBmpGrap = Graphics.FromImage(DLTrbBmp))
             {
-                Color_Slider = Com.ColorManipulation.ShiftLightnessByHSL(Me.RecommendColors.Border_INC, 0.3).ToColor();
-                Color_ScrollBar_Current = Com.ColorManipulation.ShiftLightnessByHSL(Me.RecommendColors.Border_INC, 0.3).ToColor();
-                Color_ScrollBar_Unavailable = Com.ColorManipulation.ShiftLightnessByHSL(Me.RecommendColors.Border_DEC, 0.3).ToColor();
+                DLTrbBmpGrap.Clear(Panel_DifficultyLevelAdjustment.BackColor);
+
+                //
+
+                Color Color_Slider, Color_ScrollBar_Current, Color_ScrollBar_Unavailable;
+
+                if (Com.Geometry.CursorIsInControl(Panel_DifficultyLevelAdjustment) || DifficultyLevelIsAdjusting)
+                {
+                    Color_Slider = Com.ColorManipulation.ShiftLightnessByHSL(Me.RecommendColors.Border_INC, 0.3).ToColor();
+                    Color_ScrollBar_Current = Com.ColorManipulation.ShiftLightnessByHSL(Me.RecommendColors.Border_INC, 0.3).ToColor();
+                    Color_ScrollBar_Unavailable = Com.ColorManipulation.ShiftLightnessByHSL(Me.RecommendColors.Border_DEC, 0.3).ToColor();
+                }
+                else
+                {
+                    Color_Slider = Me.RecommendColors.Border_INC.ToColor();
+                    Color_ScrollBar_Current = Me.RecommendColors.Border_INC.ToColor();
+                    Color_ScrollBar_Unavailable = Me.RecommendColors.Border_DEC.ToColor();
+                }
+
+                Rectangle Rect_Slider = new Rectangle(new Point((Panel_DifficultyLevelAdjustment.Width - DLTrbSliderSize.Width) * (DifficultyLevel - DifficultyLevel_MIN) / (DifficultyLevel_MAX - DifficultyLevel_MIN), 0), DLTrbSliderSize);
+                Rectangle Rect_ScrollBar_Current = new Rectangle(new Point(0, 0), new Size(Rect_Slider.X, Panel_DifficultyLevelAdjustment.Height));
+                Rectangle Rect_ScrollBar_Unavailable = new Rectangle(new Point(Rect_Slider.Right, 0), new Size(Panel_DifficultyLevelAdjustment.Width - Rect_Slider.Right, Panel_DifficultyLevelAdjustment.Height));
+
+                Rect_Slider.Width = Math.Max(1, Rect_Slider.Width);
+                Rect_ScrollBar_Current.Width = Math.Max(1, Rect_ScrollBar_Current.Width);
+                Rect_ScrollBar_Unavailable.Width = Math.Max(1, Rect_ScrollBar_Unavailable.Width);
+
+                GraphicsPath Path_ScrollBar_Unavailable = new GraphicsPath();
+                Path_ScrollBar_Unavailable.AddRectangle(Rect_ScrollBar_Unavailable);
+                PathGradientBrush PGB_ScrollBar_Unavailable = new PathGradientBrush(Path_ScrollBar_Unavailable)
+                {
+                    CenterColor = Color_ScrollBar_Unavailable,
+                    SurroundColors = new Color[] { Com.ColorManipulation.ShiftLightnessByHSL(Color_ScrollBar_Unavailable, 0.3) },
+                    FocusScales = new PointF(1F, 0F)
+                };
+                DLTrbBmpGrap.FillPath(PGB_ScrollBar_Unavailable, Path_ScrollBar_Unavailable);
+                Path_ScrollBar_Unavailable.Dispose();
+                PGB_ScrollBar_Unavailable.Dispose();
+
+                GraphicsPath Path_ScrollBar_Current = new GraphicsPath();
+                Path_ScrollBar_Current.AddRectangle(Rect_ScrollBar_Current);
+                PathGradientBrush PGB_ScrollBar_Current = new PathGradientBrush(Path_ScrollBar_Current)
+                {
+                    CenterColor = Color_ScrollBar_Current,
+                    SurroundColors = new Color[] { Com.ColorManipulation.ShiftLightnessByHSL(Color_ScrollBar_Current, 0.3) },
+                    FocusScales = new PointF(1F, 0F)
+                };
+                DLTrbBmpGrap.FillPath(PGB_ScrollBar_Current, Path_ScrollBar_Current);
+                Path_ScrollBar_Current.Dispose();
+                PGB_ScrollBar_Current.Dispose();
+
+                GraphicsPath Path_Slider = new GraphicsPath();
+                Path_Slider.AddRectangle(Rect_Slider);
+                PathGradientBrush PGB_Slider = new PathGradientBrush(Path_Slider)
+                {
+                    CenterColor = Color_Slider,
+                    SurroundColors = new Color[] { Com.ColorManipulation.ShiftLightnessByHSL(Color_Slider, 0.3) },
+                    FocusScales = new PointF(1F, 0F)
+                };
+                DLTrbBmpGrap.FillPath(PGB_Slider, Path_Slider);
+                Path_Slider.Dispose();
+                PGB_Slider.Dispose();
+
+                //
+
+                Label_DifficultyLevel_Val.Text = DifficultyLevel.ToString();
+                Label_DifficultyLevel_Val.Left = Math.Max(Panel_DifficultyLevelAdjustment.Left, Math.Min(Panel_DifficultyLevelAdjustment.Left + Panel_DifficultyLevelAdjustment.Width - Label_DifficultyLevel_Val.Width, Panel_DifficultyLevelAdjustment.Left + Rect_Slider.Left + (Rect_Slider.Width - Label_DifficultyLevel_Val.Width) / 2));
             }
-            else
-            {
-                Color_Slider = Me.RecommendColors.Border_INC.ToColor();
-                Color_ScrollBar_Current = Me.RecommendColors.Border_INC.ToColor();
-                Color_ScrollBar_Unavailable = Me.RecommendColors.Border_DEC.ToColor();
-            }
-
-            Rectangle Rect_Slider = new Rectangle(new Point((Panel_DifficultyLevelAdjustment.Width - DLTrbSliderSize.Width) * (DifficultyLevel - DifficultyLevel_MIN) / (DifficultyLevel_MAX - DifficultyLevel_MIN), 0), DLTrbSliderSize);
-            Rectangle Rect_ScrollBar_Current = new Rectangle(new Point(0, 0), new Size(Rect_Slider.X, Panel_DifficultyLevelAdjustment.Height));
-            Rectangle Rect_ScrollBar_Unavailable = new Rectangle(new Point(Rect_Slider.Right, 0), new Size(Panel_DifficultyLevelAdjustment.Width - Rect_Slider.Right, Panel_DifficultyLevelAdjustment.Height));
-
-            Rect_Slider.Width = Math.Max(1, Rect_Slider.Width);
-            Rect_ScrollBar_Current.Width = Math.Max(1, Rect_ScrollBar_Current.Width);
-            Rect_ScrollBar_Unavailable.Width = Math.Max(1, Rect_ScrollBar_Unavailable.Width);
-
-            GraphicsPath Path_ScrollBar_Unavailable = new GraphicsPath();
-            Path_ScrollBar_Unavailable.AddRectangle(Rect_ScrollBar_Unavailable);
-            PathGradientBrush PGB_ScrollBar_Unavailable = new PathGradientBrush(Path_ScrollBar_Unavailable)
-            {
-                CenterColor = Color_ScrollBar_Unavailable,
-                SurroundColors = new Color[] { Com.ColorManipulation.ShiftLightnessByHSL(Color_ScrollBar_Unavailable, 0.3) },
-                FocusScales = new PointF(1F, 0F)
-            };
-            DLTrbBmpGrap.FillPath(PGB_ScrollBar_Unavailable, Path_ScrollBar_Unavailable);
-            Path_ScrollBar_Unavailable.Dispose();
-            PGB_ScrollBar_Unavailable.Dispose();
-
-            GraphicsPath Path_ScrollBar_Current = new GraphicsPath();
-            Path_ScrollBar_Current.AddRectangle(Rect_ScrollBar_Current);
-            PathGradientBrush PGB_ScrollBar_Current = new PathGradientBrush(Path_ScrollBar_Current)
-            {
-                CenterColor = Color_ScrollBar_Current,
-                SurroundColors = new Color[] { Com.ColorManipulation.ShiftLightnessByHSL(Color_ScrollBar_Current, 0.3) },
-                FocusScales = new PointF(1F, 0F)
-            };
-            DLTrbBmpGrap.FillPath(PGB_ScrollBar_Current, Path_ScrollBar_Current);
-            Path_ScrollBar_Current.Dispose();
-            PGB_ScrollBar_Current.Dispose();
-
-            GraphicsPath Path_Slider = new GraphicsPath();
-            Path_Slider.AddRectangle(Rect_Slider);
-            PathGradientBrush PGB_Slider = new PathGradientBrush(Path_Slider)
-            {
-                CenterColor = Color_Slider,
-                SurroundColors = new Color[] { Com.ColorManipulation.ShiftLightnessByHSL(Color_Slider, 0.3) },
-                FocusScales = new PointF(1F, 0F)
-            };
-            DLTrbBmpGrap.FillPath(PGB_Slider, Path_Slider);
-            Path_Slider.Dispose();
-            PGB_Slider.Dispose();
-
-            //
-
-            Label_DifficultyLevel_Val.Text = DifficultyLevel.ToString();
-            Label_DifficultyLevel_Val.Left = Math.Max(Panel_DifficultyLevelAdjustment.Left, Math.Min(Panel_DifficultyLevelAdjustment.Left + Panel_DifficultyLevelAdjustment.Width - Label_DifficultyLevel_Val.Width, Panel_DifficultyLevelAdjustment.Left + Rect_Slider.Left + (Rect_Slider.Width - Label_DifficultyLevel_Val.Width) / 2));
         }
 
         private void RepaintDLTrb()

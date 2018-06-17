@@ -2,7 +2,7 @@
 Copyright © 2013-2018 chibayuki@foxmail.com
 
 数独
-Version 7.1.17000.4433.R12.180617-0000
+Version 7.1.17000.4433.R12.180618-0000
 
 This file is part of 数独
 
@@ -39,7 +39,7 @@ namespace WinFormApp
         private static readonly Int32 BuildNumber = new Version(Application.ProductVersion).Build; // 版本号。
         private static readonly Int32 BuildRevision = new Version(Application.ProductVersion).Revision; // 修订版本。
         private static readonly string LabString = "R12"; // 分支名。
-        private static readonly string BuildTime = "180617-0000"; // 编译时间。
+        private static readonly string BuildTime = "180618-0000"; // 编译时间。
 
         //
 
@@ -948,11 +948,11 @@ namespace WinFormApp
                         {
                             Version NewestVersion = OldVersionList_Copy[0];
 
-                            foreach (var V in OldVersionList_Copy)
+                            foreach (Version Ver in OldVersionList_Copy)
                             {
-                                if (NewestVersion <= V)
+                                if (NewestVersion <= Ver)
                                 {
-                                    NewestVersion = V;
+                                    NewestVersion = Ver;
                                 }
                             }
 
@@ -994,9 +994,9 @@ namespace WinFormApp
             {
                 if (OldVersionList.Count > 0)
                 {
-                    foreach (var V in OldVersionList)
+                    foreach (Version Ver in OldVersionList)
                     {
-                        string Dir = RootDir_Product + "\\" + V.Build + "." + V.Revision;
+                        string Dir = RootDir_Product + "\\" + Ver.Build + "." + Ver.Revision;
 
                         if (Directory.Exists(Dir))
                         {
@@ -1048,11 +1048,11 @@ namespace WinFormApp
                     {
                         string SubStr = Com.Text.GetIntervalString(Cfg, "<Order>", "</Order>", false, false);
 
-                        foreach (var V in Enum.GetValues(typeof(Orders)))
+                        foreach (object Obj in Enum.GetValues(typeof(Orders)))
                         {
-                            if (SubStr.Trim().ToUpper() == V.ToString().ToUpper())
+                            if (SubStr.Trim().ToUpper() == Obj.ToString().ToUpper())
                             {
-                                Order = (Orders)V;
+                                Order = (Orders)Obj;
 
                                 break;
                             }
@@ -1088,11 +1088,11 @@ namespace WinFormApp
                     {
                         string SubStr = Com.Text.GetIntervalString(Cfg, "<OperationMode>", "</OperationMode>", false, false);
 
-                        foreach (var V in Enum.GetValues(typeof(OperationModes)))
+                        foreach (object Obj in Enum.GetValues(typeof(OperationModes)))
                         {
-                            if (SubStr.Trim().ToUpper() == V.ToString().ToUpper())
+                            if (SubStr.Trim().ToUpper() == Obj.ToString().ToUpper())
                             {
-                                OperationMode = (OperationModes)V;
+                                OperationMode = (OperationModes)Obj;
 
                                 break;
                             }
@@ -1118,11 +1118,11 @@ namespace WinFormApp
                     {
                         string SubStr = Com.Text.GetIntervalString(Cfg, "<Theme>", "</Theme>", false, false);
 
-                        foreach (var V in Enum.GetValues(typeof(Com.WinForm.Theme)))
+                        foreach (object Obj in Enum.GetValues(typeof(Com.WinForm.Theme)))
                         {
-                            if (SubStr.Trim().ToUpper() == V.ToString().ToUpper())
+                            if (SubStr.Trim().ToUpper() == Obj.ToString().ToUpper())
                             {
-                                Me.Theme = (Com.WinForm.Theme)V;
+                                Me.Theme = (Com.WinForm.Theme)Obj;
 
                                 break;
                             }
@@ -1525,9 +1525,9 @@ namespace WinFormApp
             // 擦除上次游戏。
             //
 
-            foreach (var V in ElementIndexList_Last)
+            foreach (Point A in ElementIndexList_Last)
             {
-                ElementMatrix_Last[V.X, V.Y] = 0;
+                ElementMatrix_Last[A.X, A.Y] = 0;
             }
 
             ElementIndexList_Last.Clear();
@@ -1798,9 +1798,9 @@ namespace WinFormApp
 
             ElementMatrix_Initialize();
 
-            foreach (var V in ElementIndexList_Last)
+            foreach (Point A in ElementIndexList_Last)
             {
-                ElementMatrix_Add(V, ElementMatrix_Last[V.X, V.Y]);
+                ElementMatrix_Add(A, ElementMatrix_Last[A.X, A.Y]);
             }
 
             for (int X = 0; X < Range.Width; X++)
@@ -1953,18 +1953,18 @@ namespace WinFormApp
 
             Record_Last = ThisRecord;
 
-            foreach (var V in ElementIndexList_Last)
+            foreach (Point A in ElementIndexList_Last)
             {
-                ElementMatrix_Last[V.X, V.Y] = 0;
+                ElementMatrix_Last[A.X, A.Y] = 0;
             }
 
             ElementIndexList_Last.Clear();
 
-            foreach (var V in ElementIndexList)
+            foreach (Point A in ElementIndexList)
             {
-                ElementMatrix_Last[V.X, V.Y] = ElementMatrix_GetValue(V);
+                ElementMatrix_Last[A.X, A.Y] = ElementMatrix_GetValue(A);
 
-                ElementIndexList_Last.Add(V);
+                ElementIndexList_Last.Add(A);
             }
 
             for (int X = 0; X < Range.Width; X++)
@@ -2506,9 +2506,9 @@ namespace WinFormApp
 
                     if (Rect_SLs != null)
                     {
-                        foreach (var V in Rect_SLs)
+                        foreach (Rectangle Rect in Rect_SLs)
                         {
-                            BmpGrap.FillRectangle(new SolidBrush(Cr_SL), V);
+                            BmpGrap.FillRectangle(new SolidBrush(Cr_SL), Rect);
                         }
                     }
                 };
@@ -2563,13 +2563,13 @@ namespace WinFormApp
 
                             if (EProbableValues != 0)
                             {
-                                foreach (var V in Values)
+                                foreach (Int32 Val in Values)
                                 {
-                                    if (V >= 1 && V <= SudokuSize)
+                                    if (Val >= 1 && Val <= SudokuSize)
                                     {
-                                        string StringText = V.ToString();
+                                        string StringText = Val.ToString();
 
-                                        Int32 X = (V - 1) % SudokuOrder, Y = (V - 1) / SudokuOrder;
+                                        Int32 X = (Val - 1) % SudokuOrder, Y = (Val - 1) / SudokuOrder;
 
                                         Color StringColor = Cr_Str;
                                         Font StringFont = Com.Text.GetSuitableFont(StringText, new Font("微软雅黑", 9F, FontStyle.Regular, GraphicsUnit.Point, 134), new SizeF(Rect_Cen.Width / 3F, Rect_Cen.Height / 3F));
@@ -3753,9 +3753,9 @@ namespace WinFormApp
             {
                 Int32 Count = 0;
 
-                foreach (var V in ElementIndexList)
+                foreach (Point A in ElementIndexList)
                 {
-                    if (!SolidFlagTable[V.X, V.Y] && CorrectionTable[V.X, V.Y])
+                    if (!SolidFlagTable[A.X, A.Y] && CorrectionTable[A.X, A.Y])
                     {
                         Count++;
                     }
@@ -4230,9 +4230,9 @@ namespace WinFormApp
                 }
             }
 
-            foreach (var V in Zeros)
+            foreach (Int32 Val in Zeros)
             {
-                Sudoku[V % SudokuSize, V / SudokuSize] = 0;
+                Sudoku[Val % SudokuSize, Val / SudokuSize] = 0;
             }
 
             //
@@ -5596,9 +5596,9 @@ namespace WinFormApp
             {
                 Panel_Current.CreateGraphics().DrawImage(CurBmp, new Point(0, 0));
 
-                foreach (var V in Panel_Current.Controls)
+                foreach (object Obj in Panel_Current.Controls)
                 {
-                    ((Control)V).Refresh();
+                    ((Control)Obj).Refresh();
                 }
             }
         }
@@ -5724,11 +5724,11 @@ namespace WinFormApp
 
                     Panel_FunctionAreaTab.AutoScroll = false;
 
-                    foreach (var V in Panel_FunctionAreaTab.Controls)
+                    foreach (object Obj in Panel_FunctionAreaTab.Controls)
                     {
-                        if (V is Panel)
+                        if (Obj is Panel)
                         {
-                            Panel Pnl = V as Panel;
+                            Panel Pnl = Obj as Panel;
 
                             Pnl.Location = new Point(0, 0);
                         }

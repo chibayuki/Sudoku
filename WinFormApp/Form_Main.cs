@@ -1,12 +1,12 @@
 ﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-Copyright © 2013-2018 chibayuki@foxmail.com
+Copyright © 2018 chibayuki@foxmail.com
 
-数独
-Version 7.1.17000.4433.R12.180618-0000
+数独 (Sudoku)
+Version 7.1.17000.6230.R12.180707-1700
 
-This file is part of 数独
+This file is part of "数独" (Sudoku)
 
-数独 is released under the GPLv3 license
+"数独" (Sudoku) is released under the GPLv3 license
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 using System;
@@ -39,7 +39,7 @@ namespace WinFormApp
         private static readonly Int32 BuildNumber = new Version(Application.ProductVersion).Build; // 版本号。
         private static readonly Int32 BuildRevision = new Version(Application.ProductVersion).Revision; // 修订版本。
         private static readonly string LabString = "R12"; // 分支名。
-        private static readonly string BuildTime = "180618-0000"; // 编译时间。
+        private static readonly string BuildTime = "180707-1700"; // 编译时间。
 
         //
 
@@ -66,8 +66,8 @@ namespace WinFormApp
             new Version(7, 1, 17000, 3982),
             new Version(7, 1, 17000, 4189),
             new Version(7, 1, 17000, 4234),
-            new Version(7, 1, 17000, 4279),/*
-            new Version(7, 1, 17000, 4433)*/
+            new Version(7, 1, 17000, 4279),
+            new Version(7, 1, 17000, 4433)
         };
 
         //

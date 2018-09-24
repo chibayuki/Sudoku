@@ -2,7 +2,7 @@
 Copyright © 2018 chibayuki@foxmail.com
 
 数独 (Sudoku)
-Version 7.1.17000.6230.R12.180707-1700
+Version 7.1.17000.6230.R14.180924-0000
 
 This file is part of "数独" (Sudoku)
 
@@ -32,14 +32,14 @@ namespace WinFormApp
         #region 版本信息
 
         private static readonly string ApplicationName = Application.ProductName; // 程序名。
-        private static readonly string ApplicationEdition = "7.1.12"; // 程序版本。
+        private static readonly string ApplicationEdition = "7.1.14"; // 程序版本。
 
         private static readonly Int32 MajorVersion = new Version(Application.ProductVersion).Major; // 主版本。
         private static readonly Int32 MinorVersion = new Version(Application.ProductVersion).Minor; // 副版本。
         private static readonly Int32 BuildNumber = new Version(Application.ProductVersion).Build; // 版本号。
         private static readonly Int32 BuildRevision = new Version(Application.ProductVersion).Revision; // 修订版本。
-        private static readonly string LabString = "R12"; // 分支名。
-        private static readonly string BuildTime = "180707-1700"; // 编译时间。
+        private static readonly string LabString = "R14"; // 分支名。
+        private static readonly string BuildTime = "180924-0000"; // 编译时间。
 
         //
 
@@ -67,7 +67,8 @@ namespace WinFormApp
             new Version(7, 1, 17000, 4189),
             new Version(7, 1, 17000, 4234),
             new Version(7, 1, 17000, 4279),
-            new Version(7, 1, 17000, 4433)
+            new Version(7, 1, 17000, 4433),/*
+            new Version(7, 1, 17000, 6230)*/
         };
 
         //
@@ -277,23 +278,6 @@ namespace WinFormApp
             get
             {
                 return Me;
-            }
-        }
-
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                const int WS_MINIMIZEBOX = 0x00020000;
-
-                CreateParams CP = base.CreateParams;
-
-                if (Me != null && Me.FormStyle != Com.WinForm.FormStyle.Dialog)
-                {
-                    CP.Style = CP.Style | WS_MINIMIZEBOX;
-                }
-
-                return CP;
             }
         }
 
@@ -780,7 +764,7 @@ namespace WinFormApp
             {
                 Pen P = new Pen(Me.RecommendColors.Border_DEC.ToColor(), 1);
                 Control Ctrl = PictureBox_Score;
-                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width, Ctrl.Top + Ctrl.Height / 2));
+                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width - Ctrl.Left, Ctrl.Top + Ctrl.Height / 2));
                 P.Dispose();
             }
 
@@ -801,7 +785,7 @@ namespace WinFormApp
             {
                 Pen P = new Pen(Me.RecommendColors.Border_DEC.ToColor(), 1);
                 Control Ctrl = PictureBox_GameTime;
-                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width, Ctrl.Top + Ctrl.Height / 2));
+                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width - Ctrl.Left, Ctrl.Top + Ctrl.Height / 2));
                 P.Dispose();
             }
         }
@@ -818,7 +802,7 @@ namespace WinFormApp
             {
                 Pen P = new Pen(Me.RecommendColors.Border_DEC.ToColor(), 1);
                 Control Ctrl = Label_Order;
-                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width, Ctrl.Top + Ctrl.Height / 2));
+                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width - Ctrl.Left, Ctrl.Top + Ctrl.Height / 2));
                 P.Dispose();
             }
         }
@@ -835,7 +819,7 @@ namespace WinFormApp
             {
                 Pen P = new Pen(Me.RecommendColors.Border_DEC.ToColor(), 1);
                 Control Ctrl = Label_DifficultyLevel;
-                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width, Ctrl.Top + Ctrl.Height / 2));
+                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width - Ctrl.Left, Ctrl.Top + Ctrl.Height / 2));
                 P.Dispose();
             }
         }
@@ -852,7 +836,7 @@ namespace WinFormApp
             {
                 Pen P = new Pen(Me.RecommendColors.Border_DEC.ToColor(), 1);
                 Control Ctrl = Label_ShowNotes;
-                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width, Ctrl.Top + Ctrl.Height / 2));
+                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width - Ctrl.Left, Ctrl.Top + Ctrl.Height / 2));
                 P.Dispose();
             }
         }
@@ -869,7 +853,7 @@ namespace WinFormApp
             {
                 Pen P = new Pen(Me.RecommendColors.Border_DEC.ToColor(), 1);
                 Control Ctrl = Label_OperationMode;
-                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width, Ctrl.Top + Ctrl.Height / 2));
+                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width - Ctrl.Left, Ctrl.Top + Ctrl.Height / 2));
                 P.Dispose();
             }
         }
@@ -886,7 +870,7 @@ namespace WinFormApp
             {
                 Pen P = new Pen(Me.RecommendColors.Border_DEC.ToColor(), 1);
                 Control Ctrl = Label_Save;
-                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width, Ctrl.Top + Ctrl.Height / 2));
+                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width - Ctrl.Left, Ctrl.Top + Ctrl.Height / 2));
                 P.Dispose();
             }
         }
@@ -903,7 +887,7 @@ namespace WinFormApp
             {
                 Pen P = new Pen(Me.RecommendColors.Border_DEC.ToColor(), 1);
                 Control Ctrl = Label_ThemeColor;
-                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width, Ctrl.Top + Ctrl.Height / 2));
+                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width - Ctrl.Left, Ctrl.Top + Ctrl.Height / 2));
                 P.Dispose();
             }
         }
@@ -920,7 +904,7 @@ namespace WinFormApp
             {
                 Pen P = new Pen(Me.RecommendColors.Border_DEC.ToColor(), 1);
                 Control Ctrl = Label_AntiAlias;
-                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width, Ctrl.Top + Ctrl.Height / 2));
+                e.Graphics.DrawLine(P, new Point(Ctrl.Right, Ctrl.Top + Ctrl.Height / 2), new Point(Cntr.Width - Ctrl.Left, Ctrl.Top + Ctrl.Height / 2));
                 P.Dispose();
             }
         }
@@ -4847,6 +4831,7 @@ namespace WinFormApp
                     Grap.SmoothingMode = SmoothingMode.AntiAlias;
 
                     Grap.DrawLine(new Pen(color, 2F), new Point(5, 19), new Point(19, 19));
+                    Grap.DrawLine(new Pen(color, 2F), new Point(8, 11), new Point(13, 16));
                     Grap.DrawLines(new Pen(color, 2F), new Point[] { new Point(9, 18), new Point(5, 14), new Point(14, 5), new Point(19, 10), new Point(11, 18) });
                 }
 
@@ -5225,7 +5210,10 @@ namespace WinFormApp
 
             if (!BackgroundWorker_LoadGameStep.IsBusy && !BackgroundWorker_SaveGameStep.IsBusy)
             {
-                Panel_Environment.Focus();
+                if (Me.IsActive)
+                {
+                    Panel_Environment.Focus();
+                }
 
                 //
 

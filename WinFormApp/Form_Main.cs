@@ -2,7 +2,7 @@
 Copyright © 2018 chibayuki@foxmail.com
 
 数独 (Sudoku)
-Version 7.1.17000.6261.R14.181002-1400
+Version 7.1.17000.6261.R15.190322-0000
 
 This file is part of "数独" (Sudoku)
 
@@ -32,14 +32,14 @@ namespace WinFormApp
         #region 版本信息
 
         private static readonly string ApplicationName = Application.ProductName; // 程序名。
-        private static readonly string ApplicationEdition = "7.1.14"; // 程序版本。
+        private static readonly string ApplicationEdition = "7.1.15"; // 程序版本。
 
         private static readonly Int32 MajorVersion = new Version(Application.ProductVersion).Major; // 主版本。
         private static readonly Int32 MinorVersion = new Version(Application.ProductVersion).Minor; // 副版本。
         private static readonly Int32 BuildNumber = new Version(Application.ProductVersion).Build; // 版本号。
         private static readonly Int32 BuildRevision = new Version(Application.ProductVersion).Revision; // 修订版本。
-        private static readonly string LabString = "R14"; // 分支名。
-        private static readonly string BuildTime = "181002-1400"; // 编译时间。
+        private static readonly string LabString = "R15"; // 分支名。
+        private static readonly string BuildTime = "190322-0000"; // 编译时间。
 
         //
 
@@ -68,7 +68,8 @@ namespace WinFormApp
             new Version(7, 1, 17000, 4234),
             new Version(7, 1, 17000, 4279),
             new Version(7, 1, 17000, 4433),
-            new Version(7, 1, 17000, 6230)
+            new Version(7, 1, 17000, 6230),/*
+            new Version(7, 1, 17000, 6261)*/
         };
 
         //
@@ -2449,7 +2450,7 @@ namespace WinFormApp
                 bool AIsPointed = (A == GameUIPointedIndex);
                 bool AIsSelected = (A == OperatingIndex);
                 bool OpIDIsCorrectAtA = (EProbableValues != 0 && (OperatingIndex.X >= 0 && OperatingIndex.X < Range.Width && OperatingIndex.Y >= 0 && OperatingIndex.Y < Range.Height) && Com.BitOperation.BinaryHasBit(EProbableValues, ElementMatrix_GetValue(OperatingIndex)));
-                bool OpNumIsCorrectAtA = (EProbableValues != 0 && Com.BitOperation.BinaryHasBit(EProbableValues, OperatingNumber));
+                bool OpNumIsCorrectAtA = (EProbableValues != 0&& OperatingNumber>=0 && Com.BitOperation.BinaryHasBit(EProbableValues, OperatingNumber));
                 bool EIsEqualToOpID = ((OperatingIndex.X >= 0 && OperatingIndex.X < Range.Width && OperatingIndex.Y >= 0 && OperatingIndex.Y < Range.Height) && E == ElementMatrix_GetValue(OperatingIndex));
                 bool EIsEqualToOpNum = (E == OperatingNumber);
 

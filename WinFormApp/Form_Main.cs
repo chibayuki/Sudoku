@@ -1964,37 +1964,39 @@ namespace WinFormApp
 
             //
 
-            string Str = string.Empty;
+            StringBuilder StrBdr = new StringBuilder();
 
-            Str += "<Log>";
+            StrBdr.Append("<Log>");
 
-            Str += "<OrderValue>" + (Int32)Order + "</OrderValue>";
+            StrBdr.Append("<OrderValue>" + (Int32)Order + "</OrderValue>");
 
-            Str += "<DifficultyLevel>" + DifficultyLevel + "</DifficultyLevel>";
+            StrBdr.Append("<DifficultyLevel>" + DifficultyLevel + "</DifficultyLevel>");
 
-            Str += "<ShowNotes>" + ShowNotes + "</ShowNotes>";
+            StrBdr.Append("<ShowNotes>" + ShowNotes + "</ShowNotes>");
 
-            Str += "<Element>[";
+            StrBdr.Append("<Element>[");
             for (int i = 0; i < ElementIndexList.Count; i++)
             {
                 Point A = ElementIndexList[i];
 
-                Str += "(" + A.X + "," + A.Y + "," + ElementMatrix_GetValue(A) + "," + (SolidFlagTable[A.X, A.Y] ? "1" : "0") + ")";
+                StrBdr.Append("(" + A.X + "," + A.Y + "," + ElementMatrix_GetValue(A) + "," + (SolidFlagTable[A.X, A.Y] ? "1" : "0") + ")");
             }
-            Str += "]</Element>";
+            StrBdr.Append("]</Element>");
 
-            Str += "<GameTime>" + ThisRecord.GameTime.TotalMilliseconds + "</GameTime>";
-            Str += "<StepCount>" + ThisRecord.StepCount + "</StepCount>";
+            StrBdr.Append("<GameTime>" + ThisRecord.GameTime.TotalMilliseconds + "</GameTime>");
+            StrBdr.Append("<StepCount>" + ThisRecord.StepCount + "</StepCount>");
 
             if (SaveEveryStep)
             {
                 double PreviousPct = 0, NextPct = 0;
 
+                StringBuilder StepListStrBdr = new StringBuilder();
+
                 if (StepList_Previous.Count > 0)
                 {
                     PreviousPct = (double)StepList_Previous.Count / (StepList_Previous.Count + StepList_Next.Count);
 
-                    StepListString += "<Previous>";
+                    StepListStrBdr.Append("<Previous>");
                     for (int i = 0; i < StepList_Previous.Count; i++)
                     {
                         if (BackgroundWorker_SaveGameStep.IsBusy)
@@ -2006,27 +2008,27 @@ namespace WinFormApp
 
                         Step S = StepList_Previous[i];
 
-                        StepListString += "[";
+                        StepListStrBdr.Append("[");
                         for (int X = 0; X < Range.Width; X++)
                         {
                             for (int Y = 0; Y < Range.Height; Y++)
                             {
                                 if (S.ElementMatrix[X, Y] != 0)
                                 {
-                                    StepListString += "(" + X + "," + Y + "," + S.ElementMatrix[X, Y] + ")";
+                                    StepListStrBdr.Append("(" + X + "," + Y + "," + S.ElementMatrix[X, Y] + ")");
                                 }
                             }
                         }
-                        StepListString += "]";
+                        StepListStrBdr.Append("]");
                     }
-                    StepListString += "</Previous>";
+                    StepListStrBdr.Append("</Previous>");
                 }
 
                 if (StepList_Next.Count > 0)
                 {
                     NextPct = (double)StepList_Next.Count / (StepList_Previous.Count + StepList_Next.Count);
 
-                    StepListString += "<Next>";
+                    StepListStrBdr.Append("<Next>");
                     for (int i = 0; i < StepList_Next.Count; i++)
                     {
                         if (BackgroundWorker_SaveGameStep.IsBusy)
@@ -2038,26 +2040,28 @@ namespace WinFormApp
 
                         Step S = StepList_Next[i];
 
-                        StepListString += "[";
+                        StepListStrBdr.Append("[");
                         for (int X = 0; X < Range.Width; X++)
                         {
                             for (int Y = 0; Y < Range.Height; Y++)
                             {
                                 if (S.ElementMatrix[X, Y] != 0)
                                 {
-                                    StepListString += "(" + X + "," + Y + "," + S.ElementMatrix[X, Y] + ")";
+                                    StepListStrBdr.Append("(" + X + "," + Y + "," + S.ElementMatrix[X, Y] + ")");
                                 }
                             }
                         }
-                        StepListString += "]";
+                        StepListStrBdr.Append("]");
                     }
-                    StepListString += "</Next>";
+                    StepListStrBdr.Append("</Next>");
                 }
+
+                StepListString = StepListStrBdr.ToString();
             }
 
-            Str += "<Step>" + StepListString + "</Step>";
+            StrBdr.Append("<Step>" + StepListString + "</Step>");
 
-            Str += "</Log>";
+            StrBdr.Append("</Log>");
 
             //
 
@@ -2069,7 +2073,7 @@ namespace WinFormApp
                 }
 
                 StreamWriter SW = new StreamWriter(RecordFilePath, false);
-                SW.WriteLine(Str);
+                SW.WriteLine(StrBdr.ToString());
                 SW.Close();
             }
             catch { }
